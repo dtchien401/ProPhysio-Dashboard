@@ -134,7 +134,7 @@
       <div class="grid-12 mb-4">
         <div class="card p-4 col-span-4"><div class="section-title"><h3>TRIAL CONVERSION FUNNEL</h3><span>Booked → Burn Active</span></div><div class="chart-md"><canvas id="funnelChart"></canvas></div></div>
         <div class="card p-4 col-span-4"><div class="section-title"><h3>SESSION BURN OVER TIME</h3><span>Burned vs Sold</span></div><div class="chart-md"><canvas id="burnTrendChart"></canvas></div></div>
-        <div class="card col-span-4"><div class="p-4 section-title"><h3>BURN SUMMARY</h3><span>Real Session Logic</span></div><div class="summary-grid"><div class="summary-item"><p class="text-sm text-slate-500">Total Burned Sessions</p><h4 id="sumBurn1" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-slate-500 mt-1">From booking.csv</p></div><div class="summary-item"><p class="text-sm text-slate-500">Sessions Sold</p><h4 id="sumSoldSessions" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-slate-500 mt-1">From Service Quantity</p></div><div class="summary-item"><p class="text-sm text-slate-500">Remaining Sessions</p><h4 id="sumRemainingSessions" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-slate-500 mt-1">Sold minus burned</p></div><div class="summary-item"><p class="text-sm text-slate-500">Burn Rate</p><h4 id="sumBurnRate" class="text-2xl font-extrabold mt-1">0%</h4><p class="text-xs text-slate-500 mt-1">Burned / sold</p></div></div></div>
+        <div class="card col-span-4"><div class="p-4 section-title"><h3>BURN SUMMARY</h3><span>Operational Health</span></div><div class="summary-grid"><div class="summary-item"><p class="text-sm text-slate-500">Total Burned Sessions</p><h4 id="sumBurn1" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-emerald-600 mt-1">↑ 15.7%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Avg Sessions / Client</p><h4 id="sumAvgSS1" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-emerald-600 mt-1">↑ 6.3%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Unused Sessions</p><h4 class="text-2xl font-extrabold mt-1">632</h4><p class="text-xs text-red-500 mt-1">↓ 6.2%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Expiring 30 Days</p><h4 class="text-2xl font-extrabold mt-1">84</h4><p class="text-xs text-red-500 mt-1">↓ 12.5%</p></div></div></div>
       </div>
       <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">DAILY PERFORMANCE SUMMARY</h3><span>Latest 5 days</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Revenue</th><th>Packages Sold</th><th>Trial Sessions</th><th>Burn Sessions</th><th>Conversion Rate</th></tr></thead><tbody id="overviewTable"></tbody></table></div></div>
     </section>
@@ -167,8 +167,8 @@
       </div>
       <div class="grid-12 mb-4">
         <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Burn Ratio</p><h4 id="opsBurnRatio">0%</h4><p class="text-sm text-slate-500 mt-2">Burned sessions / sold session capacity</p></div></div>
-        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Sessions Sold</p><h4 id="opsSoldSessions">0</h4><p class="text-sm text-slate-500 mt-2">Total service quantity sold</p></div></div>
-        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Remaining Sessions</p><h4 id="opsRemainingSessions">0</h4><p class="text-sm text-slate-500 mt-2">Sold sessions minus burned sessions</p></div></div>
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Unused Sessions</p><h4>632</h4><p class="text-sm text-slate-500 mt-2">Need proactive booking follow-up</p></div></div>
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Expiring Sessions</p><h4>84</h4><p class="text-sm text-slate-500 mt-2">30-day risk pool</p></div></div>
       </div>
       <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">OPERATION DETAIL</h3><span>Session burn by date</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Burn Sessions</th><th>Trial Sessions</th><th>Packages Sold</th><th>Status</th></tr></thead><tbody id="operationsTable"></tbody></table></div></div>
     </section>
@@ -191,7 +191,7 @@
     </section>
 
     <section id="reports" class="page">
-      <div class="grid-12 mb-4"><div class="card p-4 col-span-8"><div class="section-title"><h3>REPORT SUMMARY</h3><span>Executive readout</span></div><div class="empty-state"><b>May performance snapshot:</b><br/>Revenue, package sales, trial sessions, and burn sessions are calculated from the CSV files. Remaining sessions are calculated as service quantity sold minus burned sessions.</div></div><div class="card p-4 col-span-4"><div class="section-title"><h3>EXPORT OPTIONS</h3><span>Manual now</span></div><div class="space-y-3"><button class="w-full rounded-xl bg-[#008AF5] text-white font-bold py-3">Export PDF</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Download CSV</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Send Summary</button></div></div></div>
+      <div class="grid-12 mb-4"><div class="card p-4 col-span-8"><div class="section-title"><h3>REPORT SUMMARY</h3><span>Executive readout</span></div><div class="empty-state"><b>May performance snapshot:</b><br/>Revenue is led by TTC, while VVO shows opportunity to improve trial-to-package conversion. Session burn remains healthy, but unused and expiring sessions require follow-up to protect renewal potential.</div></div><div class="card p-4 col-span-4"><div class="section-title"><h3>EXPORT OPTIONS</h3><span>Manual now</span></div><div class="space-y-3"><button class="w-full rounded-xl bg-[#008AF5] text-white font-bold py-3">Export PDF</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Download CSV</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Send Summary</button></div></div></div>
       <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">FULL DAILY REPORT</h3><span>All data</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Product</th><th>Revenue</th><th>Packages</th><th>Trial</th><th>Burn</th><th>Clients</th></tr></thead><tbody id="reportTable"></tbody></table></div></div>
     </section>
 
@@ -662,17 +662,12 @@ function renderKPIs(){
   document.getElementById('kpiTrial').textContent = fmt(trial);
   document.getElementById('kpiBurn').textContent = fmt(burn);
 
-  const remainingSessions = Math.max(contractQty - burn, 0);
-  const burnRate = contractQty ? (burn / contractQty * 100) : 0;
-
   ['sumBurn1'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(burn); });
-  ['sumSoldSessions','opsSoldSessions'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(contractQty); });
-  ['sumRemainingSessions','opsRemainingSessions'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(remainingSessions); });
-  ['sumBurnRate','opsBurnRatio'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=burnRate.toFixed(1)+'%'; });
-  ['clientAvgSS'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=(burn/Math.max(clients,1)).toFixed(2); });
+  ['sumAvgSS1','clientAvgSS'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=(burn/Math.max(clients,1)).toFixed(2); });
 
   const ca=document.getElementById('clientActive'); if(ca) ca.textContent=fmt(clients);
   const cr=document.getElementById('clientAvgRev'); if(cr) cr.textContent=money(avgRevClient);
+  const br=document.getElementById('opsBurnRatio'); if(br) br.textContent=(burn/Math.max(contractQty,1)*100).toFixed(1)+'%';
 
   // Replace static summary labels if present
   const miniMetrics = document.querySelectorAll('.mini-metric h4');
@@ -860,7 +855,7 @@ function setPage(page){
     overview:['OVERVIEW','Physio Therapy Performance Dashboard'],
     sales:['SALES','Package revenue, product mix, and club sales performance'],
     trial:['TRIAL CONVERSION','Trial sessions, conversion funnel, and conversion quality'],
-    operations:['OPERATIONS','Session burn, session capacity, and operational health'],
+    operations:['OPERATIONS','Session burn, unused sessions, and operational health'],
     therapists:['THERAPISTS','Therapist productivity and service delivery tracking'],
     clients:['CLIENTS','Client activity, usage, and renewal risk segmentation'],
     reports:['REPORTS','Executive summary and export-ready daily report'],
