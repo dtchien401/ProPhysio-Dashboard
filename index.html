@@ -1,566 +1,307 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dự án Vật lý trị liệu Cali - Enraf-Nonius</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
-        .tab-active { border-bottom: 4px solid #3b82f6; color: #1e40af; font-weight: 700; }
-        .hidden { display: none; }
-        .timeline-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 20px;
-            height: 100%;
-            width: 2px;
-            background: #e2e8f0;
-        }
-        @media (min-width: 768px) {
-            .timeline-container::before {
-                left: 50%;
-                transform: translateX(-50%);
-            }
-        }
-        .tech-card:hover { transform: translateY(-5px); transition: all 0.3s ease; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>California ProPhysio Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:'Inter',sans-serif; background:#f6f9fd; color:#0f172a; }
+    .app { min-height:100vh; display:flex; background:#f6f9fd; }
+    .sidebar { width:260px; flex:0 0 260px; min-height:100vh; background:#fff; border-right:1px solid #e6edf6; padding:22px 18px; display:flex; flex-direction:column; justify-content:space-between; }
+    .logo { width:190px; height:auto; object-fit:contain; margin:10px 8px 34px; }
+    .nav-item { display:flex; align-items:center; gap:13px; padding:14px 16px; border-radius:16px; color:#334155; font-size:15px; font-weight:750; cursor:pointer; user-select:none; transition:.18s ease; }
+    .nav-item:hover { background:#eef7ff; color:#008AF5; }
+    .nav-item.active { background:#008AF5; color:#fff; box-shadow:0 14px 30px rgba(0,138,245,.22); }
+    .nav-icon { width:22px; text-align:center; opacity:.9; }
+    .side-label { font-size:12px; font-weight:850; letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px; color:#0f172a; }
+    .select { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:16px; padding:13px 14px; outline:none; color:#0f172a; font-weight:650; }
+    .main { flex:1; padding:24px; min-width:0; }
+    .topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:18px; }
+    .page-title { font-size:30px; line-height:1.1; font-weight:850; letter-spacing:-.04em; }
+    .page-subtitle { color:#64748b; margin-top:6px; font-size:14px; }
+    .segmented { background:#fff; border:1px solid #dce8f4; border-radius:15px; padding:4px; display:flex; box-shadow:0 10px 25px rgba(15,23,42,.04); }
+    .segmented button { padding:10px 28px; border-radius:11px; font-weight:800; font-size:14px; color:#334155; }
+    .segmented button.active { background:#008AF5; color:#fff; }
+    .date-chip { background:#fff; border:1px solid #dce8f4; border-radius:15px; padding:14px 18px; font-size:14px; font-weight:700; color:#334155; box-shadow:0 10px 25px rgba(15,23,42,.04); }
+    .card { background:#fff; border:1px solid #e1ebf5; border-radius:18px; box-shadow:0 10px 26px rgba(15,23,42,.045); }
+    .kpi-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:12px; margin-bottom:14px; }
+    .kpi-card { padding:16px; display:flex; align-items:center; gap:12px; min-height:108px; }
+    .icon-pill { width:42px; height:42px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:#eaf5ff; color:#008AF5; font-weight:900; flex:0 0 42px; }
+    .kpi-label { font-size:11px; color:#64748b; font-weight:850; letter-spacing:.02em; }
+    .kpi-value { font-size:24px; font-weight:850; margin-top:5px; letter-spacing:-.03em; }
+    .kpi-change { font-size:12px; color:#059669; margin-top:8px; font-weight:750; }
+    .grid-12 { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:14px; }
+    .section-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .section-title h3 { font-size:14px; font-weight:850; letter-spacing:-.01em; }
+    .section-title span { font-size:12px; color:#94a3b8; font-weight:650; }
+    .chart-lg { height:245px; }
+    .chart-md { height:220px; }
+    .chart-sm { height:190px; }
+    canvas { width:100%!important; height:100%!important; }
+    .page { display:none; }
+    .page.active { display:block; }
+    .table-wrap { overflow:auto; border:1px solid #e5edf7; border-radius:14px; }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th { background:#f8fbff; color:#475569; font-weight:850; text-align:center; padding:10px; border-bottom:1px solid #e5edf7; white-space:nowrap; }
+    td { padding:10px; border-bottom:1px solid #eef3f8; text-align:center; color:#0f172a; white-space:nowrap; }
+    td:first-child, th:first-child { text-align:left; }
+    tr:hover td { background:#f3f9ff; }
+    .summary-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; }
+    .summary-item { padding:18px; min-height:100px; border-bottom:1px solid #edf2f7; }
+    .summary-item:nth-child(odd) { border-right:1px solid #edf2f7; }
+    .summary-item:nth-child(n+3) { border-bottom:none; }
+    .mini-metric { padding:18px; }
+    .mini-metric h4 { font-size:24px; font-weight:850; margin-top:4px; }
+    .badge { display:inline-flex; align-items:center; border-radius:999px; padding:7px 11px; background:#eaf5ff; color:#0078dd; font-size:12px; font-weight:850; }
+    .empty-state { padding:28px; border:1px dashed #cfe0f1; border-radius:18px; background:#fbfdff; color:#64748b; }
+    @media (max-width:1300px){ .kpi-grid{grid-template-columns:repeat(3,1fr);} .grid-12{grid-template-columns:repeat(6,1fr);} .col-span-5,.col-span-4,.col-span-3,.col-span-6,.col-span-8{grid-column:span 6/span 6!important;} }
+    @media (max-width:900px){ .app{display:block;} .sidebar{width:100%; min-height:auto;} .main{padding:18px;} .topbar{flex-direction:column;} .kpi-grid{grid-template-columns:repeat(2,1fr);} }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div>
+      <img src="logo.png" alt="California ProPhysio" class="logo" />
+      <nav class="space-y-2">
+        <div class="nav-item active" data-page="overview"><span class="nav-icon">⌂</span>Overview</div>
+        <div class="nav-item" data-page="sales"><span class="nav-icon">▣</span>Sales</div>
+        <div class="nav-item" data-page="trial"><span class="nav-icon">▽</span>Trial Conversion</div>
+        <div class="nav-item" data-page="operations"><span class="nav-icon">⚙</span>Operations</div>
+        <div class="nav-item" data-page="therapists"><span class="nav-icon">♙</span>Therapists</div>
+        <div class="nav-item" data-page="clients"><span class="nav-icon">☷</span>Clients</div>
+        <div class="nav-item" data-page="reports"><span class="nav-icon">□</span>Reports</div>
+        <div class="nav-item" data-page="settings"><span class="nav-icon">⚙</span>Settings</div>
+      </nav>
+    </div>
 
-    <!-- Header -->
-    <header class="gradient-bg text-white py-12 px-6 shadow-xl">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-center md:text-left">
-                <div class="flex items-center gap-3 mb-2 justify-center md:justify-start flex-wrap">
-                    <span class="bg-blue-500 text-[10px] uppercase px-2 py-1 rounded font-bold tracking-widest">Premium Equipment</span>
-                    <span class="bg-white/15 text-[10px] uppercase px-2 py-1 rounded font-bold tracking-widest border border-white/20">1 Location Model</span>
-                    <h1 class="text-3xl md:text-4xl font-bold tracking-tight">Cali Physical Therapy Center</h1>
-                </div>
-                <p class="text-blue-200 text-lg">Hệ thống trị liệu công nghệ cao Enraf-Nonius (Hà Lan)</p>
-                <p class="text-white/80 text-sm mt-2">Lưu ý: Toàn bộ financial model dưới đây được xây dựng cho <strong>1 location / 1 CLB</strong>.</p>
-            </div>
-            <div class="mt-2 md:mt-0 flex gap-4">
-                <div class="bg-white/10 p-3 rounded-lg text-center min-w-[140px] backdrop-blur-sm border border-white/20">
-                    <span class="block text-xs uppercase opacity-70">Tổng vốn Capex</span>
-                    <span class="text-xl font-bold">399,000,000</span>
-                </div>
-                <div class="bg-green-500/20 p-3 rounded-lg text-center min-w-[140px] border border-green-500/30 backdrop-blur-sm">
-                    <span class="block text-xs uppercase opacity-70 font-bold text-green-300">Hoàn vốn (ROI)</span>
-                    <span class="text-xl font-bold text-green-400">5.0 Tháng</span>
-                </div>
-            </div>
+    <div class="space-y-5">
+      <div>
+        <div class="side-label">Club Filter</div>
+        <select id="clubFilter" class="select">
+          <option value="ALL">All Clubs</option>
+          <option value="TTC">TTC</option>
+          <option value="VVO">VVO</option>
+        </select>
+      </div>
+      <div>
+        <div class="side-label">Date Range</div>
+        <select id="dateFilter" class="select">
+          <option value="MAY">May 1 – May 31, 2025</option>
+        </select>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed pt-5">Last updated:<br/>May 31, 2025 10:30 AM</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle" class="page-title">OVERVIEW</h1>
+        <p id="pageSubtitle" class="page-subtitle">Physio Therapy Performance Dashboard</p>
+      </div>
+      <div class="flex items-center gap-4 flex-wrap">
+        <div class="segmented">
+          <button data-club-button="TTC">TTC</button>
+          <button data-club-button="VVO">VVO</button>
+          <button class="active" data-club-button="ALL">All Clubs</button>
         </div>
+        <div class="date-chip">May 1 – May 31, 2025 ▾</div>
+      </div>
     </header>
 
-    <!-- Highlight -->
-    <section class="max-w-6xl mx-auto px-6 -mt-4 relative z-10">
-        <div class="bg-green-50 border border-green-200 rounded-2xl px-6 py-4 shadow-sm">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                <div>
-                    <div class="text-xs uppercase text-green-700 font-bold tracking-widest">Investment Highlight</div>
-                    <div class="text-lg font-bold text-green-900">Per 1 Location: 5-Month Payback | Strong Year 1 Free Cashflow</div>
-                </div>
-                <div class="text-sm text-slate-600">
-                    Model này áp dụng cho <strong>1 location</strong>, chưa nhân rộng toàn hệ thống.
-                </div>
-            </div>
-        </div>
+    <section class="kpi-grid">
+      <div class="card kpi-card"><div class="icon-pill">$</div><div><div class="kpi-label">TOTAL REVENUE</div><div id="kpiRevenue" class="kpi-value">$0</div><div class="kpi-change">↑ 18.6%</div></div></div>
+      <div class="card kpi-card"><div class="icon-pill">▢</div><div><div class="kpi-label">PACKAGES SOLD</div><div id="kpiPackages" class="kpi-value">0</div><div class="kpi-change">↑ 16.2%</div></div></div>
+      <div class="card kpi-card"><div class="icon-pill">○</div><div><div class="kpi-label">TRIAL SESSIONS</div><div id="kpiTrial" class="kpi-value">0</div><div class="kpi-change">↑ 22.4%</div></div></div>
+      <div class="card kpi-card"><div class="icon-pill">〽</div><div><div class="kpi-label">BURN SESSIONS</div><div id="kpiBurn" class="kpi-value">0</div><div class="kpi-change">↑ 15.7%</div></div></div>
+      <div class="card kpi-card"><div class="icon-pill">♟</div><div><div class="kpi-label">ACTIVE CLIENTS</div><div id="kpiClients" class="kpi-value">0</div><div class="kpi-change">↑ 13.3%</div></div></div>
+      <div class="card kpi-card"><div class="icon-pill">$</div><div><div class="kpi-label">AVG REV / CLIENT</div><div id="kpiAvg" class="kpi-value">$0</div><div class="kpi-change">↑ 4.8%</div></div></div>
     </section>
 
-    <!-- Navigation Tabs -->
-    <nav class="bg-white border-b sticky top-0 z-50 shadow-sm overflow-x-auto mt-8">
-        <div class="max-w-6xl mx-auto flex whitespace-nowrap">
-            <button onclick="switchTab('services')" id="btn-services" class="tab-active py-4 px-8 text-sm uppercase tracking-wider flex items-center gap-2">
-                <i class="fas fa-concierge-bell"></i> Dịch vụ & Công nghệ
-            </button>
-            <button onclick="switchTab('business')" id="btn-business" class="py-4 px-8 text-sm uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                <i class="fas fa-chart-line"></i> Tài chính chi tiết
-            </button>
-            <button onclick="switchTab('timeline')" id="btn-timeline" class="py-4 px-8 text-sm uppercase tracking-wider text-slate-500 flex items-center gap-2 border-b-4 border-transparent">
-                <i class="fas fa-calendar-alt"></i> Lộ trình triển khai
-            </button>
-        </div>
-    </nav>
+    <section id="overview" class="page active">
+      <div class="grid-12 mb-4">
+        <div class="card p-4 col-span-5"><div class="section-title"><h3>REVENUE TREND</h3><span>This Month vs Last Month</span></div><div class="chart-lg"><canvas id="revenueTrendChart"></canvas></div></div>
+        <div class="card p-4 col-span-3"><div class="section-title"><h3>REVENUE BY CLUB</h3><span>Revenue</span></div><div class="chart-lg"><canvas id="clubChart"></canvas></div></div>
+        <div class="card p-4 col-span-4"><div class="section-title"><h3>REVENUE BY PRODUCT</h3><span>Mix</span></div><div class="chart-lg"><canvas id="productMixChart"></canvas></div></div>
+      </div>
+      <div class="grid-12 mb-4">
+        <div class="card p-4 col-span-4"><div class="section-title"><h3>TRIAL CONVERSION FUNNEL</h3><span>Booked → Burn Active</span></div><div class="chart-md"><canvas id="funnelChart"></canvas></div></div>
+        <div class="card p-4 col-span-4"><div class="section-title"><h3>SESSION BURN OVER TIME</h3><span>Burned vs Sold</span></div><div class="chart-md"><canvas id="burnTrendChart"></canvas></div></div>
+        <div class="card col-span-4"><div class="p-4 section-title"><h3>BURN SUMMARY</h3><span>Operational Health</span></div><div class="summary-grid"><div class="summary-item"><p class="text-sm text-slate-500">Total Burned Sessions</p><h4 id="sumBurn1" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-emerald-600 mt-1">↑ 15.7%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Avg Sessions / Client</p><h4 id="sumAvgSS1" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-emerald-600 mt-1">↑ 6.3%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Unused Sessions</p><h4 class="text-2xl font-extrabold mt-1">632</h4><p class="text-xs text-red-500 mt-1">↓ 6.2%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Expiring 30 Days</p><h4 class="text-2xl font-extrabold mt-1">84</h4><p class="text-xs text-red-500 mt-1">↓ 12.5%</p></div></div></div>
+      </div>
+      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">DAILY PERFORMANCE SUMMARY</h3><span>Latest 5 days</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Revenue</th><th>Packages Sold</th><th>Trial Sessions</th><th>Burn Sessions</th><th>Conversion Rate</th></tr></thead><tbody id="overviewTable"></tbody></table></div></div>
+    </section>
 
-    <!-- Tab 1: Services & Technology -->
-    <main id="tab-services" class="max-w-6xl mx-auto py-10 px-6">
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-8">
-            <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                <i class="fas fa-microchip text-blue-600"></i> Menu Dịch vụ & Thiết bị
-            </h2>
-            <div class="text-xs uppercase tracking-widest text-slate-500 font-bold">
-                Service menu proposed for 1 location
-            </div>
-        </div>
-        
-        <div class="bg-white rounded-2xl shadow-sm border overflow-hidden mb-10">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm align-top">
-                    <thead class="bg-yellow-300 text-slate-900 text-xs uppercase font-bold">
-                        <tr>
-                            <th class="px-4 py-4 text-center border-r border-yellow-400">No.</th>
-                            <th class="px-4 py-4 text-left border-r border-yellow-400">Tên gói</th>
-                            <th class="px-4 py-4 text-left border-r border-yellow-400">Đối tượng</th>
-                            <th class="px-4 py-4 text-center border-r border-yellow-400">Thời lượng</th>
-                            <th class="px-4 py-4 text-left border-r border-yellow-400">Quy trình thực hiện</th>
-                            <th class="px-4 py-4 text-left border-r border-yellow-400">Tác dụng</th>
-                            <th class="px-4 py-4 text-right">Giá bán lẻ đề nghị</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 bg-slate-50">
-                        <tr class="align-top">
-                            <td class="px-4 py-5 text-center font-bold text-slate-700">1</td>
-                            <td class="px-4 py-5 font-bold text-blue-900 min-w-[180px]">Phục Hồi Nhanh</td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[290px]">
-                                <div class="space-y-2">
-                                    <div>hội viên gym</div>
-                                    <div>người mới tập gym</div>
-                                    <div>đau cơ sau tập (DOMS)</div>
-                                    <div>khách đang tập PT</div>
-                                    <div>khách tập chương trình giảm cân</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-center font-semibold whitespace-nowrap">30 phút</td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[260px]">
-                                <div>ENDOMED 482 – Electrotherapy</div>
-                            </td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[180px]">
-                                <div class="space-y-2">
-                                    <div>giảm đau cơ sau tập</div>
-                                    <div>thư giãn cơ</div>
-                                    <div>phục hồi nhanh</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-right font-bold whitespace-nowrap">690,000</td>
-                        </tr>
+    <section id="sales" class="page">
+      <div class="grid-12 mb-4">
+        <div class="card p-4 col-span-6"><div class="section-title"><h3>PACKAGE REVENUE BY PRODUCT</h3><span>Revenue ranking</span></div><div class="chart-lg"><canvas id="salesProductRevenueChart"></canvas></div></div>
+        <div class="card p-4 col-span-6"><div class="section-title"><h3>PACKAGES SOLD BY PRODUCT</h3><span>Volume mix</span></div><div class="chart-lg"><canvas id="salesPackageChart"></canvas></div></div>
+      </div>
+      <div class="grid-12 mb-4">
+        <div class="card p-4 col-span-6"><div class="section-title"><h3>SALES BY CLUB</h3><span>TTC vs VVO</span></div><div class="chart-md"><canvas id="salesClubChart"></canvas></div></div>
+        <div class="card p-4 col-span-6"><div class="section-title"><h3>SALES INSIGHTS</h3><span>Commercial notes</span></div><div class="grid grid-cols-2 gap-3"><div class="empty-state"><b>Top Product</b><br/><span id="topProductText">-</span></div><div class="empty-state"><b>Best Club</b><br/><span id="bestClubText">-</span></div><div class="empty-state"><b>Action</b><br/>Push bundle scripts for the highest-converting recovery packages.</div><div class="empty-state"><b>Risk</b><br/>Low package count after trial means follow-up process needs tightening.</div></div></div>
+      </div>
+      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">SALES DETAIL</h3><span>By date and product</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Product</th><th>Revenue</th><th>Packages</th><th>Trial</th><th>Burn</th></tr></thead><tbody id="salesTable"></tbody></table></div></div>
+    </section>
 
-                        <tr class="align-top">
-                            <td class="px-4 py-5 text-center font-bold text-slate-700">2</td>
-                            <td class="px-4 py-5 font-bold text-blue-900 min-w-[180px]">Giảm Đau Cổ/Vai/Gáy/Lưng</td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[290px]">
-                                <div class="space-y-2">
-                                    <div>dân văn phòng</div>
-                                    <div>đau cổ vai gáy</div>
-                                    <div>đau lưng dưới</div>
-                                    <div>hội viên 40+</div>
-                                    <div>người ngồi nhiều / làm việc máy tính</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-center font-semibold whitespace-nowrap">60 phút</td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[260px]">
-                                <div class="space-y-1">
-                                    <div>ENDOMED 482 – Electrotherapy (30p)</div>
-                                    <div>Stretching (30p)</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[180px]">
-                                <div class="space-y-2">
-                                    <div>giảm đau cổ vai gáy</div>
-                                    <div>giảm căng cơ lưng</div>
-                                    <div>tăng tuần hoàn sâu</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-right font-bold whitespace-nowrap">890,000</td>
-                        </tr>
+    <section id="trial" class="page">
+      <div class="grid-12 mb-4">
+        <div class="card p-4 col-span-4"><div class="section-title"><h3>TRIAL FUNNEL</h3><span>Conversion path</span></div><div class="chart-lg"><canvas id="trialFunnelChart"></canvas></div></div>
+        <div class="card p-4 col-span-4"><div class="section-title"><h3>TRIAL SESSIONS BY CLUB</h3><span>Demand</span></div><div class="chart-lg"><canvas id="trialClubChart"></canvas></div></div>
+        <div class="card p-4 col-span-4"><div class="section-title"><h3>CONVERSION RATE BY CLUB</h3><span>Package / Trial</span></div><div class="chart-lg"><canvas id="conversionClubChart"></canvas></div></div>
+      </div>
+      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">TRIAL CONVERSION DETAIL</h3><span>By date</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Trial Sessions</th><th>Packages Sold</th><th>Conversion Rate</th><th>Suggested Action</th></tr></thead><tbody id="trialTable"></tbody></table></div></div>
+    </section>
 
-                        <tr class="align-top">
-                            <td class="px-4 py-5 text-center font-bold text-slate-700">3</td>
-                            <td class="px-4 py-5 font-bold text-blue-900 min-w-[180px]">Trị liệu Phục Hồi Chuyên Sâu</td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[290px]">
-                                <div class="space-y-2">
-                                    <div>đau vai</div>
-                                    <div>đau đầu gối</div>
-                                    <div>tennis elbow</div>
-                                    <div>runner injury</div>
-                                    <div>chấn thương khi tập gym</div>
-                                    <div>người đau gân / đau cơ</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-center font-semibold whitespace-nowrap">80 phút</td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[280px]">
-                                <div class="space-y-1">
-                                    <div>Stretching với Cali PT – 40p</div>
-                                    <div>SONOPULS 490 – Ultrasound therapy (10p)</div>
-                                    <div>ENDOMED 482 – Electrotherapy (30p)</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[180px]">
-                                <div class="space-y-2">
-                                    <div>giảm viêm mô mềm</div>
-                                    <div>giảm đau sâu</div>
-                                    <div>phục hồi chấn thương</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-right font-bold whitespace-nowrap">1,290,000</td>
-                        </tr>
+    <section id="operations" class="page">
+      <div class="grid-12 mb-4">
+        <div class="card p-4 col-span-8"><div class="section-title"><h3>SESSION BURN TREND</h3><span>Operational usage</span></div><div class="chart-lg"><canvas id="operationsBurnTrendChart"></canvas></div></div>
+        <div class="card p-4 col-span-4"><div class="section-title"><h3>BURN BY CLUB</h3><span>Usage distribution</span></div><div class="chart-lg"><canvas id="operationsBurnClubChart"></canvas></div></div>
+      </div>
+      <div class="grid-12 mb-4">
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Burn Ratio</p><h4 id="opsBurnRatio">0%</h4><p class="text-sm text-slate-500 mt-2">Burned sessions / sold session capacity</p></div></div>
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Unused Sessions</p><h4>632</h4><p class="text-sm text-slate-500 mt-2">Need proactive booking follow-up</p></div></div>
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Expiring Sessions</p><h4>84</h4><p class="text-sm text-slate-500 mt-2">30-day risk pool</p></div></div>
+      </div>
+      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">OPERATION DETAIL</h3><span>Session burn by date</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Burn Sessions</th><th>Trial Sessions</th><th>Packages Sold</th><th>Status</th></tr></thead><tbody id="operationsTable"></tbody></table></div></div>
+    </section>
 
-                        <tr class="align-top">
-                            <td class="px-4 py-5 text-center font-bold text-slate-700">4</td>
-                            <td class="px-4 py-5 font-bold text-blue-900 min-w-[180px]">Trị Liệu Phục Hồi Cao Cấp</td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[290px]">
-                                <div class="space-y-2">
-                                    <div>PT clients</div>
-                                    <div>member VIP</div>
-                                    <div>người tập cường độ cao</div>
-                                    <div>runner / athlete</div>
-                                    <div>khách tập transformation program</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-center font-semibold whitespace-nowrap">100 phút</td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[280px]">
-                                <div class="space-y-1">
-                                    <div>Stretching với Cali PT – 60p</div>
-                                    <div>SONOPULS 490 – Ultrasound therapy (10p)</div>
-                                    <div>ENDOMED 482 – Electrotherapy (30p)</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-slate-700 min-w-[180px]">
-                                <div class="space-y-2">
-                                    <div>phục hồi cơ sâu</div>
-                                    <div>tối ưu hiệu suất tập luyện</div>
-                                    <div>giảm nguy cơ chấn thương</div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-5 text-right font-bold whitespace-nowrap">1,790,000</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
+    <section id="therapists" class="page">
+      <div class="grid-12 mb-4">
+        <div class="card p-4 col-span-6"><div class="section-title"><h3>THERAPIST PRODUCTIVITY</h3><span>Sample staffing view</span></div><div class="chart-lg"><canvas id="therapistChart"></canvas></div></div>
+        <div class="card p-4 col-span-6"><div class="section-title"><h3>THERAPIST NOTES</h3><span>Future data connection</span></div><div class="grid grid-cols-2 gap-3"><div class="empty-state"><b>Need data field:</b><br/>Therapist name per session.</div><div class="empty-state"><b>Measure:</b><br/>Sessions delivered, trial conversion, utilization.</div><div class="empty-state"><b>Use:</b><br/>Plan roster, bonus, coaching and service quality.</div><div class="empty-state"><b>Next step:</b><br/>Add therapist column into raw data.</div></div></div>
+      </div>
+      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">THERAPIST TABLE</h3><span>Sample</span></div><div class="table-wrap"><table><thead><tr><th>Therapist</th><th>Club</th><th>Burn Sessions</th><th>Trial Sessions</th><th>Packages Sold</th><th>Conversion</th></tr></thead><tbody id="therapistTable"></tbody></table></div></div>
+    </section>
 
-    <!-- Tab 2: Financials -->
-    <main id="tab-business" class="max-w-6xl mx-auto py-10 px-6 hidden">
-        
-        <div class="mb-6 bg-blue-50 border border-blue-100 rounded-2xl p-5">
-            <div class="flex items-start gap-3">
-                <i class="fas fa-circle-info text-blue-600 mt-1"></i>
-                <div>
-                    <h3 class="font-bold text-blue-900">Financial Model Scope</h3>
-                    <p class="text-sm text-blue-800/80 mt-1">
-                        Toàn bộ phần tài chính dưới đây được tính cho <strong>1 location / 1 club</strong>. 
-                        Đây chưa phải consolidated model cho nhiều CLB hoặc toàn hệ thống.
-                    </p>
-                </div>
-            </div>
-        </div>
+    <section id="clients" class="page">
+      <div class="grid-12 mb-4">
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Active Clients</p><h4 id="clientActive">0</h4><p class="text-sm text-slate-500 mt-2">Clients with package or usage this month</p></div></div>
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Avg Revenue / Client</p><h4 id="clientAvgRev">$0</h4><p class="text-sm text-slate-500 mt-2">Revenue quality indicator</p></div></div>
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Avg Sessions / Client</p><h4 id="clientAvgSS">0</h4><p class="text-sm text-slate-500 mt-2">Usage intensity indicator</p></div></div>
+      </div>
+      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">CLIENT SEGMENTATION</h3><span>Sample structure</span></div><div class="table-wrap"><table><thead><tr><th>Segment</th><th>Definition</th><th>Clients</th><th>Risk</th><th>Recommended Action</th></tr></thead><tbody><tr><td>New Trial</td><td>Completed trial, no package yet</td><td>52</td><td>Medium</td><td>Call within 24 hours</td></tr><tr><td>Active Burn</td><td>Burned session in last 7 days</td><td>118</td><td>Low</td><td>Keep booking rhythm</td></tr><tr><td>Low Usage</td><td>No burn in 14 days</td><td>34</td><td>High</td><td>Recovery reminder + booking</td></tr><tr><td>Expiring</td><td>Sessions expire in 30 days</td><td>84</td><td>High</td><td>Usage acceleration + renewal</td></tr></tbody></table></div></div>
+    </section>
 
-        <!-- 1. Capex -->
-        <div class="mb-12">
-            <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
-                <i class="fas fa-wallet text-blue-600"></i> Phân bổ ngân sách đầu tư (Capex) – 1 Location
-            </h3>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <div class="text-xs text-slate-400 uppercase font-bold mb-1">Thiết bị trị liệu</div>
-                    <div class="text-2xl font-bold text-slate-900">179,000,000</div>
-                    <p class="text-[11px] text-slate-500 mt-2">Dòng máy Enraf-Nonius cấu hình đầu tư cho 1 location.</p>
-                    <div class="text-xs text-slate-400 mt-3">US$ 6,755</div>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <div class="text-xs text-slate-400 uppercase font-bold mb-1">Cải tạo mặt bằng</div>
-                    <div class="text-2xl font-bold text-slate-900">220,000,000</div>
-                    <p class="text-[11px] text-slate-500 mt-2">Thi công không gian và setup vận hành cho 1 location.</p>
-                    <div class="text-xs text-slate-400 mt-3">US$ 8,302</div>
-                </div>
-                <div class="bg-blue-600 p-6 rounded-2xl shadow-lg text-white">
-                    <div class="text-xs opacity-80 uppercase font-bold mb-1">Tổng cộng đầu tư</div>
-                    <div class="text-2xl font-bold">399,000,000</div>
-                    <p class="text-[11px] opacity-80 mt-2">Toàn bộ vốn đầu tư ban đầu cho 1 location.</p>
-                    <div class="text-xs opacity-80 mt-3">US$ 15,057</div>
-                </div>
-            </div>
-        </div>
+    <section id="reports" class="page">
+      <div class="grid-12 mb-4"><div class="card p-4 col-span-8"><div class="section-title"><h3>REPORT SUMMARY</h3><span>Executive readout</span></div><div class="empty-state"><b>May performance snapshot:</b><br/>Revenue is led by TTC, while VVO shows opportunity to improve trial-to-package conversion. Session burn remains healthy, but unused and expiring sessions require follow-up to protect renewal potential.</div></div><div class="card p-4 col-span-4"><div class="section-title"><h3>EXPORT OPTIONS</h3><span>Manual now</span></div><div class="space-y-3"><button class="w-full rounded-xl bg-[#008AF5] text-white font-bold py-3">Export PDF</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Download CSV</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Send Summary</button></div></div></div>
+      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">FULL DAILY REPORT</h3><span>All data</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Product</th><th>Revenue</th><th>Packages</th><th>Trial</th><th>Burn</th><th>Clients</th></tr></thead><tbody id="reportTable"></tbody></table></div></div>
+    </section>
 
-        <!-- 2. Revenue & Opex -->
-        <div class="grid md:grid-cols-2 gap-8 mb-12">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="p-4 bg-slate-50 border-b flex justify-between items-center">
-                    <h4 class="font-bold text-slate-700">Cơ cấu doanh thu (Tháng trung bình)</h4>
-                    <span class="text-[10px] font-bold text-blue-600">350 Sessions/tháng / 1 location</span>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex justify-between items-end border-b pb-3">
-                        <div>
-                            <span class="block text-sm font-semibold">Khách lẻ & Trải nghiệm</span>
-                            <span class="text-[10px] text-slate-400">~120 lượt x 890k</span>
-                        </div>
-                        <span class="font-bold text-slate-800">106,800,000</span>
-                    </div>
-                    <div class="flex justify-between items-end border-b pb-3">
-                        <div>
-                            <span class="block text-sm font-semibold">Gói liệu trình (Pack 10-20)</span>
-                            <span class="text-[10px] text-slate-400">Chuyển đổi từ hội viên PT</span>
-                        </div>
-                        <span class="font-bold text-slate-800">158,500,000</span>
-                    </div>
-                    <div class="flex justify-between items-end border-b pb-3">
-                        <div>
-                            <span class="block text-sm font-semibold">Bổ trợ & Cross-sell</span>
-                            <span class="text-[10px] text-slate-400">Sản phẩm đi kèm, Member VIP</span>
-                        </div>
-                        <span class="font-bold text-slate-800">14,700,000</span>
-                    </div>
-                    <div class="pt-2 flex justify-between">
-                        <span class="font-bold text-blue-900">TỔNG DOANH THU THỰC TẾ / 1 LOCATION</span>
-                        <span class="font-bold text-blue-600">~280,000,000</span>
-                    </div>
-                </div>
-            </div>
+    <section id="settings" class="page">
+      <div class="grid-12 mb-4"><div class="card p-4 col-span-6"><div class="section-title"><h3>DATA SOURCE SETUP</h3><span>Next phase</span></div><div class="space-y-4"><div><label class="side-label">Google Sheet JSON API URL</label><input class="select" placeholder="Paste API URL here" /></div><div><label class="side-label">Default Club View</label><select class="select"><option>All Clubs</option><option>TTC</option><option>VVO</option></select></div><button class="rounded-xl bg-[#008AF5] text-white font-bold px-5 py-3">Save Settings</button></div></div><div class="card p-4 col-span-6"><div class="section-title"><h3>REQUIRED RAW DATA FIELDS</h3><span>For automation</span></div><div class="table-wrap"><table><thead><tr><th>Field</th><th>Example</th><th>Purpose</th></tr></thead><tbody><tr><td>Date</td><td>2025-05-31</td><td>Trend</td></tr><tr><td>Club</td><td>TTC</td><td>Club filter</td></tr><tr><td>Product</td><td>Recovery Package</td><td>Product mix</td></tr><tr><td>Revenue</td><td>6450</td><td>Sales</td></tr><tr><td>Trial Sessions</td><td>18</td><td>Conversion</td></tr><tr><td>Burn Sessions</td><td>142</td><td>Operations</td></tr><tr><td>Therapist</td><td>Anna</td><td>Productivity</td></tr></tbody></table></div></div></div>
+    </section>
+  </main>
+</div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="p-4 bg-slate-50 border-b">
-                    <h4 class="font-bold text-slate-700">Chi phí vận hành & Quản lý</h4>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-slate-500">Lương nhân sự (Therapists)</span>
-                        <span class="font-medium">45,000,000</span>
-                    </div>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-slate-500">Marketing & Acquisition</span>
-                        <span class="font-medium">20,000,000</span>
-                    </div>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-slate-500">Vật tư & Điện nước</span>
-                        <span class="font-medium">15,000,000</span>
-                    </div>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-slate-500">Dự phòng phí</span>
-                        <span class="font-medium">10,000,000</span>
-                    </div>
-                    <div class="pt-6 border-t flex justify-between items-center">
-                        <div>
-                            <span class="block font-bold text-slate-800 text-lg">CASH EBITDA</span>
-                            <span class="text-[10px] text-green-600 font-bold uppercase tracking-widest">Biên lợi nhuận 49%</span>
-                        </div>
-                        <span class="text-2xl font-black text-green-600">~137M</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+<script>
+const rawData = [
+  { date:'May 31, 2025', club:'TTC', product:'Recovery Package', revenue:6450, packages:6, trial:18, burn:142, clients:28 },
+  { date:'May 31, 2025', club:'VVO', product:'Pain Relief', revenue:3920, packages:4, trial:12, burn:98, clients:20 },
+  { date:'May 30, 2025', club:'TTC', product:'Mobility Package', revenue:7890, packages:7, trial:22, burn:168, clients:31 },
+  { date:'May 30, 2025', club:'VVO', product:'Posture & Alignment', revenue:5110, packages:5, trial:15, burn:112, clients:24 },
+  { date:'May 29, 2025', club:'TTC', product:'Recovery Package', revenue:6120, packages:5, trial:16, burn:134, clients:27 },
+  { date:'May 29, 2025', club:'VVO', product:'Sports Performance', revenue:3450, packages:3, trial:11, burn:86, clients:18 },
+  { date:'May 28, 2025', club:'TTC', product:'Pain Relief', revenue:5860, packages:6, trial:14, burn:118, clients:26 },
+  { date:'May 28, 2025', club:'VVO', product:'Mobility Package', revenue:2980, packages:2, trial:9, burn:74, clients:17 },
+  { date:'May 27, 2025', club:'TTC', product:'Posture & Alignment', revenue:6980, packages:6, trial:17, burn:136, clients:30 },
+  { date:'May 27, 2025', club:'VVO', product:'Recovery Package', revenue:4120, packages:4, trial:12, burn:92, clients:19 }
+];
+const therapists = [
+  { name:'Anna', club:'TTC', burn:258, trial:36, packages:18 },
+  { name:'Minh', club:'TTC', burn:226, trial:29, packages:14 },
+  { name:'Linh', club:'VVO', burn:188, trial:27, packages:12 },
+  { name:'David', club:'VVO', burn:176, trial:24, packages:10 }
+];
+const days = Array.from({length:31},(_,i)=>`May ${i+1}`);
+const revenueTrend = [8000,12500,7200,9800,13200,6800,7400,15500,8100,9300,17400,20900,11800,5300,10100,13200,8800,11200,12100,9500,12600,12800,6900,8900,17400,14200,9300,10800,11600,19600,15100];
+const lastMonth = [5200,7400,11000,13200,9800,12700,9100,11200,12600,9800,8500,12800,10100,9200,13400,10700,15000,18100,16800,7400,9200,11100,11900,10700,12900,14200,17000,8900,13800,19700,15200];
+const burnTrend = [180,310,420,510,570,640,720,860,920,1010,1090,1170,1260,1340,1390,1510,1580,1610,1690,1770,1840,1860,1930,2010,2080,2190,2260,2310,2400,2510,2600];
+const soldTrend = burnTrend.map((v,i)=>v+180+i*14);
+const fmt = n => new Intl.NumberFormat('en-US').format(Math.round(n));
+const sum = (arr,k)=>arr.reduce((a,b)=>a+(+b[k]||0),0);
+const group = (arr,k)=>arr.reduce((a,b)=>((a[b[k]]=(a[b[k]]||[]).concat(b)),a),{});
+let currentPage = 'overview';
+let charts = {};
+function filtered(){ const c=document.getElementById('clubFilter').value; return c==='ALL'?rawData:rawData.filter(d=>d.club===c); }
+function destroy(id){ if(charts[id]) charts[id].destroy(); }
+function makeChart(id, config){ if(!document.getElementById(id)) return; destroy(id); charts[id]=new Chart(document.getElementById(id), config); }
+function baseOptions(extra={}){ return { responsive:true, maintainAspectRatio:false, plugins:{ legend:{labels:{color:'#334155', boxWidth:11, usePointStyle:true}}, tooltip:{backgroundColor:'#fff', titleColor:'#0f172a', bodyColor:'#334155', borderColor:'#dbe8f6', borderWidth:1}}, scales:{x:{ticks:{color:'#64748b', maxRotation:0}, grid:{color:'rgba(15,23,42,.06)'}}, y:{ticks:{color:'#64748b'}, grid:{color:'rgba(15,23,42,.06)'}}}, ...extra }; }
+function productRows(data){ const g=group(data,'product'); return Object.keys(g).map(p=>({product:p,revenue:sum(g[p],'revenue'),packages:sum(g[p],'packages')})).sort((a,b)=>b.revenue-a.revenue); }
+function clubRows(data){ const g=group(data,'club'); return Object.keys(g).map(c=>({club:c,revenue:sum(g[c],'revenue'),packages:sum(g[c],'packages'),trial:sum(g[c],'trial'),burn:sum(g[c],'burn')})); }
 
-        <!-- 3. Investment summary -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="p-6 border-b bg-slate-900 text-white flex flex-col md:flex-row md:justify-between md:items-center gap-2">
-                <h2 class="text-lg font-bold">Investment Summary – 1 Location (5-Year View)</h2>
-                <span class="text-xs bg-white/20 px-2 py-1 rounded">Đơn vị: VND / USD</span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px]">
-                        <tr>
-                            <th class="px-6 py-4 text-left">Investment Metrics</th>
-                            <th class="px-6 py-4 text-center">Year 1</th>
-                            <th class="px-6 py-4 text-center">Year 2</th>
-                            <th class="px-6 py-4 text-center">Year 3</th>
-                            <th class="px-6 py-4 text-center">Year 4</th>
-                            <th class="px-6 py-4 text-center">Year 5</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y text-slate-700">
-                        <tr class="bg-slate-50">
-                            <td class="px-6 py-4 font-semibold text-slate-900">Capital Commitment (VND)</td>
-                            <td class="px-6 py-4 text-center font-bold text-red-600">(399,000,000)</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Marketing Branding (VND)</td>
-                            <td class="px-6 py-4 text-center text-orange-600">(132,500,000)</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                        </tr>
-                        <tr class="bg-blue-50/50">
-                            <td class="px-6 py-4 font-bold text-blue-900 uppercase text-xs">Cash EBITDA (VND)</td>
-                            <td class="px-6 py-4 text-center font-bold text-blue-600">1,367,247,636</td>
-                            <td class="px-6 py-4 text-center font-bold text-blue-600">969,415,283</td>
-                            <td class="px-6 py-4 text-center font-bold text-blue-600">935,424,420</td>
-                            <td class="px-6 py-4 text-center font-bold text-blue-600">935,424,420</td>
-                            <td class="px-6 py-4 text-center font-bold text-blue-600">935,424,420</td>
-                        </tr>
-                        <tr class="bg-green-50 font-bold border-t-2 border-slate-200">
-                            <td class="px-6 py-4 text-green-700 uppercase text-xs">Free Cashflow (VND)</td>
-                            <td class="px-6 py-4 text-center text-green-600">835,747,636</td>
-                            <td class="px-6 py-4 text-center text-green-600">969,415,283</td>
-                            <td class="px-6 py-4 text-center text-green-600">935,424,420</td>
-                            <td class="px-6 py-4 text-center text-green-600">935,424,420</td>
-                            <td class="px-6 py-4 text-center text-green-600">935,424,420</td>
-                        </tr>
+function renderKPIs(){
+  const data=filtered(); const revenue=sum(data,'revenue'), packages=sum(data,'packages'), trial=sum(data,'trial'), burn=sum(data,'burn'), clients=sum(data,'clients');
+  document.getElementById('kpiRevenue').textContent='$'+fmt(revenue);
+  document.getElementById('kpiPackages').textContent=fmt(packages);
+  document.getElementById('kpiTrial').textContent=fmt(trial);
+  document.getElementById('kpiBurn').textContent=fmt(burn);
+  document.getElementById('kpiClients').textContent=fmt(clients);
+  document.getElementById('kpiAvg').textContent='$'+fmt(revenue/Math.max(clients,1));
+  ['sumBurn1'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(burn); });
+  ['sumAvgSS1','clientAvgSS'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=(burn/Math.max(clients,1)).toFixed(2); });
+  const ca=document.getElementById('clientActive'); if(ca) ca.textContent=fmt(clients);
+  const cr=document.getElementById('clientAvgRev'); if(cr) cr.textContent='$'+fmt(revenue/Math.max(clients,1));
+  const br=document.getElementById('opsBurnRatio'); if(br) br.textContent=(burn/Math.max(packages*12,1)*100).toFixed(1)+'%';
+}
 
-                        <tr class="bg-slate-50">
-                            <td class="px-6 py-4 font-semibold text-slate-900">Capital Commitment (USD)</td>
-                            <td class="px-6 py-4 text-center">15,057</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4">Marketing Branding (USD)</td>
-                            <td class="px-6 py-4 text-center">5,000</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                            <td class="px-6 py-4 text-center text-slate-300">-</td>
-                        </tr>
-                        <tr class="bg-blue-50/50">
-                            <td class="px-6 py-4 font-bold text-blue-900 uppercase text-xs">Cash EBITDA (USD)</td>
-                            <td class="px-6 py-4 text-center font-bold text-blue-600">51,594</td>
-                            <td class="px-6 py-4 text-center font-bold text-blue-600">36,582</td>
-                            <td class="px-6 py-4 text-center font-bold text-blue-600">35,299</td>
-                            <td class="px-6 py-4 text-center font-bold text-blue-600">35,299</td>
-                            <td class="px-6 py-4 text-center font-bold text-blue-600">35,299</td>
-                        </tr>
-                        <tr class="bg-green-50 font-bold border-t-2 border-slate-200">
-                            <td class="px-6 py-4 text-green-700 uppercase text-xs">Free Cashflow (USD)</td>
-                            <td class="px-6 py-4 text-center text-green-600">31,538</td>
-                            <td class="px-6 py-4 text-center text-green-600">36,582</td>
-                            <td class="px-6 py-4 text-center text-green-600">35,299</td>
-                            <td class="px-6 py-4 text-center text-green-600">35,299</td>
-                            <td class="px-6 py-4 text-center text-green-600">35,299</td>
-                        </tr>
+function renderTables(){
+  const data=filtered();
+  const byDate=Object.values(group(data,'date'));
+  const summaryRows=byDate.map(rows=>{ const rev=sum(rows,'revenue'), pkg=sum(rows,'packages'), tr=sum(rows,'trial'), bu=sum(rows,'burn'); return `<tr><td>${rows[0].date}</td><td>$${fmt(rev)}</td><td>${pkg}</td><td>${tr}</td><td>${bu}</td><td>${(pkg/Math.max(tr,1)*100).toFixed(1)}%</td></tr>`; }).join('');
+  ['overviewTable'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=summaryRows; });
+  const detail=data.map(d=>`<tr><td>${d.date}</td><td>${d.club}</td><td>${d.product}</td><td>$${fmt(d.revenue)}</td><td>${d.packages}</td><td>${d.trial}</td><td>${d.burn}</td><td>${d.clients}</td></tr>`).join('');
+  const sales=data.map(d=>`<tr><td>${d.date}</td><td>${d.club}</td><td>${d.product}</td><td>$${fmt(d.revenue)}</td><td>${d.packages}</td><td>${d.trial}</td><td>${d.burn}</td></tr>`).join('');
+  const trial=data.map(d=>`<tr><td>${d.date}</td><td>${d.club}</td><td>${d.trial}</td><td>${d.packages}</td><td>${(d.packages/Math.max(d.trial,1)*100).toFixed(1)}%</td><td>${d.packages/d.trial>.35?'Maintain follow-up rhythm':'Improve post-trial call'}</td></tr>`).join('');
+  const ops=data.map(d=>`<tr><td>${d.date}</td><td>${d.club}</td><td>${d.burn}</td><td>${d.trial}</td><td>${d.packages}</td><td>${d.burn>100?'Healthy':'Needs booking push'}</td></tr>`).join('');
+  const therapistRows=therapists.map(t=>`<tr><td>${t.name}</td><td>${t.club}</td><td>${t.burn}</td><td>${t.trial}</td><td>${t.packages}</td><td>${(t.packages/t.trial*100).toFixed(1)}%</td></tr>`).join('');
+  const map={salesTable:sales, trialTable:trial, operationsTable:ops, reportTable:detail, therapistTable:therapistRows};
+  Object.entries(map).forEach(([id,html])=>{ const el=document.getElementById(id); if(el) el.innerHTML=html; });
+}
 
-                        <tr class="text-[10px] text-slate-500">
-                            <td class="px-6 py-3">EBITDA Margin</td>
-                            <td class="px-6 py-3 text-center">49.0%</td>
-                            <td class="px-6 py-3 text-center">46.1%</td>
-                            <td class="px-6 py-3 text-center">46.0%</td>
-                            <td class="px-6 py-3 text-center">46.0%</td>
-                            <td class="px-6 py-3 text-center">46.0%</td>
-                        </tr>
-                        <tr class="text-[10px] text-slate-500">
-                            <td class="px-6 py-3">EBITDA / Total Capital Commitment</td>
-                            <td class="px-6 py-3 text-center">342.7%</td>
-                            <td class="px-6 py-3 text-center">0.0%</td>
-                            <td class="px-6 py-3 text-center">0.0%</td>
-                            <td class="px-6 py-3 text-center">0.0%</td>
-                            <td class="px-6 py-3 text-center">0.0%</td>
-                        </tr>
-                        <tr class="text-[10px] text-slate-500">
-                            <td class="px-6 py-3">Free Cashflow / Total Capital Commitment</td>
-                            <td class="px-6 py-3 text-center">209.5%</td>
-                            <td class="px-6 py-3 text-center">0.0%</td>
-                            <td class="px-6 py-3 text-center">0.0%</td>
-                            <td class="px-6 py-3 text-center">0.0%</td>
-                            <td class="px-6 py-3 text-center">0.0%</td>
-                        </tr>
-                        <tr class="text-[10px] text-slate-500 font-bold">
-                            <td class="px-6 py-3">Payback Period</td>
-                            <td class="px-6 py-3 text-center">5.0 mths</td>
-                            <td class="px-6 py-3 text-center"></td>
-                            <td class="px-6 py-3 text-center"></td>
-                            <td class="px-6 py-3 text-center"></td>
-                            <td class="px-6 py-3 text-center"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="p-4 bg-slate-50 text-[10px] text-slate-500 text-center uppercase font-bold tracking-widest">
-                * Lưu ý: Payback Period 5.0 tháng và toàn bộ số liệu tài chính ở trên được tính cho 1 location.
-            </div>
-        </div>
-    </main>
+function renderCharts(){
+  const data=filtered(); const products=productRows(data); const clubs=clubRows(rawData);
+  makeChart('revenueTrendChart',{type:'bar',data:{labels:days,datasets:[{label:'This Month',data:revenueTrend,backgroundColor:'#008AF5',borderRadius:5},{label:'Last Month',data:lastMonth,type:'line',borderColor:'#008AF5',borderDash:[5,5],pointRadius:0,tension:.35}]},options:baseOptions({scales:{x:{ticks:{color:'#64748b',autoSkip:true,maxTicksLimit:8},grid:{color:'rgba(15,23,42,.06)'}},y:{ticks:{color:'#64748b',callback:v=>'$'+(v/1000)+'K'},grid:{color:'rgba(15,23,42,.06)'}}}})});
+  makeChart('clubChart',{type:'bar',data:{labels:clubs.map(x=>x.club),datasets:[{label:'Revenue',data:clubs.map(x=>x.revenue),backgroundColor:'#008AF5',borderRadius:7}]},options:baseOptions({indexAxis:'y',scales:{x:{ticks:{color:'#64748b',callback:v=>'$'+fmt(v)},grid:{color:'rgba(15,23,42,.06)'}},y:{ticks:{color:'#64748b'},grid:{display:false}}}})});
+  makeChart('productMixChart',{type:'doughnut',data:{labels:products.map(x=>x.product),datasets:[{data:products.map(x=>x.revenue),backgroundColor:['#008AF5','#1d9bff','#38bdf8','#0f70d7','#8bc9ff'],borderColor:'#fff',borderWidth:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#334155',boxWidth:10,usePointStyle:true}}}}});
+  makeChart('funnelChart',{type:'bar',data:{labels:['Trial Booked','Trial Attended','Package Sold','Burn Active'],datasets:[{data:[312,242,128,115],backgroundColor:['#008AF5','#1894f7','#38a8ff','#8bc9ff'],borderRadius:8}]},options:baseOptions({indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:{color:'#334155'},grid:{display:false}}}})});
+  makeChart('burnTrendChart',{type:'line',data:{labels:days,datasets:[{label:'Burned Sessions',data:burnTrend,borderColor:'#008AF5',pointRadius:0,tension:.35,borderWidth:3},{label:'Sold Sessions',data:soldTrend,borderColor:'#008AF5',borderDash:[5,5],pointRadius:0,tension:.35}]},options:baseOptions({scales:{x:{ticks:{color:'#64748b',autoSkip:true,maxTicksLimit:8},grid:{color:'rgba(15,23,42,.06)'}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(15,23,42,.06)'}}}})});
+  makeChart('salesProductRevenueChart',{type:'bar',data:{labels:products.map(x=>x.product),datasets:[{label:'Revenue',data:products.map(x=>x.revenue),backgroundColor:'#008AF5',borderRadius:8}]},options:baseOptions({indexAxis:'y'})});
+  makeChart('salesPackageChart',{type:'bar',data:{labels:products.map(x=>x.product),datasets:[{label:'Packages Sold',data:products.map(x=>x.packages),backgroundColor:'#38bdf8',borderRadius:8}]},options:baseOptions()});
+  makeChart('salesClubChart',{type:'bar',data:{labels:clubs.map(x=>x.club),datasets:[{label:'Revenue',data:clubs.map(x=>x.revenue),backgroundColor:'#008AF5',borderRadius:8},{label:'Packages',data:clubs.map(x=>x.packages*1000),backgroundColor:'#8bc9ff',borderRadius:8}]},options:baseOptions()});
+  makeChart('trialFunnelChart',{type:'bar',data:{labels:['Booked','Attended','Sold','Burn Active'],datasets:[{data:[312,242,128,115],backgroundColor:'#008AF5',borderRadius:8}]},options:baseOptions({indexAxis:'y',plugins:{legend:{display:false}}})});
+  makeChart('trialClubChart',{type:'bar',data:{labels:clubs.map(x=>x.club),datasets:[{label:'Trial Sessions',data:clubs.map(x=>x.trial),backgroundColor:'#008AF5',borderRadius:8}]},options:baseOptions()});
+  makeChart('conversionClubChart',{type:'bar',data:{labels:clubs.map(x=>x.club),datasets:[{label:'Conversion %',data:clubs.map(x=>(x.packages/Math.max(x.trial,1)*100).toFixed(1)),backgroundColor:'#10b981',borderRadius:8}]},options:baseOptions({scales:{x:{ticks:{color:'#64748b'},grid:{display:false}},y:{ticks:{color:'#64748b',callback:v=>v+'%'},grid:{color:'rgba(15,23,42,.06)'}}}})});
+  makeChart('operationsBurnTrendChart',{type:'line',data:{labels:days,datasets:[{label:'Burned Sessions',data:burnTrend,borderColor:'#008AF5',pointRadius:0,tension:.35,borderWidth:3},{label:'Sold Sessions',data:soldTrend,borderColor:'#38bdf8',pointRadius:0,tension:.35,borderWidth:2}]},options:baseOptions()});
+  makeChart('operationsBurnClubChart',{type:'bar',data:{labels:clubs.map(x=>x.club),datasets:[{label:'Burn Sessions',data:clubs.map(x=>x.burn),backgroundColor:'#008AF5',borderRadius:8}]},options:baseOptions()});
+  makeChart('therapistChart',{type:'bar',data:{labels:therapists.map(x=>x.name),datasets:[{label:'Burn Sessions',data:therapists.map(x=>x.burn),backgroundColor:'#008AF5',borderRadius:8},{label:'Trial Sessions',data:therapists.map(x=>x.trial),backgroundColor:'#8bc9ff',borderRadius:8}]},options:baseOptions()});
 
-    <!-- Tab 3: Timeline -->
-    <main id="tab-timeline" class="max-w-6xl mx-auto py-10 px-6 hidden">
-        <div class="bg-white p-10 rounded-3xl shadow-sm border border-slate-100">
-            <div class="text-center mb-4">
-                <h2 class="text-2xl font-bold text-slate-800">Lộ trình triển khai Dự án</h2>
-                <p class="text-sm text-slate-500 mt-2">Timeline triển khai mẫu cho 1 location đầu tiên.</p>
-            </div>
-            
-            <div class="relative timeline-container px-4 md:px-0 mt-12">
-                <div class="mb-16 flex flex-col md:flex-row items-center w-full">
-                    <div class="hidden md:block flex-1 text-right pr-12">
-                        <span class="text-xs font-bold text-green-500 uppercase tracking-widest bg-green-50 px-3 py-1 rounded-full border border-green-100">Đã hoàn thành</span>
-                        <p class="text-sm text-slate-400 mt-2">14/03/2024</p>
-                    </div>
-                    <div class="z-10 bg-green-500 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-md text-white">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div class="flex-1 pl-12 pt-4 md:pt-0">
-                        <h4 class="font-bold text-slate-800 text-lg">Xác nhận Mô hình Kinh doanh</h4>
-                        <p class="text-sm text-slate-500 mt-1">Hoàn tất danh mục gói dịch vụ, giá bán đề nghị và quy trình vận hành phối hợp giữa PT & Therapist cho 1 location pilot.</p>
-                    </div>
-                </div>
+  const topProduct=products[0]; const bestClub=clubs.sort((a,b)=>b.revenue-a.revenue)[0];
+  const tp=document.getElementById('topProductText'); if(tp&&topProduct) tp.textContent=`${topProduct.product} — $${fmt(topProduct.revenue)}`;
+  const bc=document.getElementById('bestClubText'); if(bc&&bestClub) bc.textContent=`${bestClub.club} — $${fmt(bestClub.revenue)}`;
+}
 
-                <div class="mb-16 flex flex-col md:flex-row items-center w-full">
-                    <div class="hidden md:block flex-1 text-right pr-12">
-                        <span class="text-xs font-bold text-orange-600 uppercase tracking-widest bg-orange-50 px-3 py-1 rounded-full border border-orange-100">Hành động ngay</span>
-                        <p class="text-sm text-slate-500 mt-2">Dự kiến: 10:00AM - 24Mar</p>
-                    </div>
-                    <div class="z-10 bg-orange-500 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-xl text-white ring-4 ring-orange-100 animate-pulse">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="flex-1 pl-12 pt-4 md:pt-0">
-                        <div class="bg-orange-50/50 p-6 rounded-2xl border border-orange-100 shadow-sm">
-                            <h4 class="font-bold text-orange-900 text-lg">Họp Hội đồng GĐ Bệnh viện</h4>
-                            <p class="text-sm text-orange-800/80 mt-2 font-medium">Nội dung trọng tâm:</p>
-                            <ul class="mt-3 space-y-2">
-                                <li class="flex items-start gap-2 text-sm text-slate-700">
-                                    <i class="fas fa-caret-right mt-1 text-orange-500"></i>
-                                    <span>Ký kết thỏa thuận hợp tác chuyên môn & nhân sự therapist.</span>
-                                </li>
-                                <li class="flex items-start gap-2 text-sm text-slate-700">
-                                    <i class="fas fa-caret-right mt-1 text-orange-500"></i>
-                                    <span>Chốt cấu hình thiết bị Enraf-Nonius & duyệt ngân sách mua sắm cho 1 location (399tr tổng capex).</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-16 flex flex-col md:flex-row items-center w-full">
-                    <div class="hidden md:block flex-1 text-right pr-12">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Kế hoạch</span>
-                    </div>
-                    <div class="z-10 bg-slate-200 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-sm text-slate-400">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div class="flex-1 pl-12 pt-4 md:pt-0">
-                        <h4 class="font-bold text-slate-700 text-lg">Setup & Đào tạo</h4>
-                        <p class="text-sm text-slate-500 mt-1">Cải tạo không gian, lắp đặt máy và đào tạo vận hành cho đội ngũ PT/Therapist tại location đầu tiên.</p>
-                    </div>
-                </div>
-
-                <div class="flex flex-col md:flex-row items-center w-full">
-                    <div class="hidden md:block flex-1 text-right pr-12">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Vận hành</span>
-                    </div>
-                    <div class="z-10 bg-slate-200 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-sm text-slate-400">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                    <div class="flex-1 pl-12 pt-4 md:pt-0">
-                        <h4 class="font-bold text-slate-700 text-lg">Soft Opening</h4>
-                        <p class="text-sm text-slate-500 mt-1">Triển khai chiến dịch marketing và bắt đầu đón khách tại location đầu tiên trước khi cân nhắc scale thêm.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        function switchTab(tab) {
-            const tabs = ['services', 'business', 'timeline'];
-            tabs.forEach(t => {
-                document.getElementById('tab-' + t).classList.add('hidden');
-                document.getElementById('btn-' + t).classList.remove('tab-active');
-                document.getElementById('btn-' + t).classList.add('text-slate-500');
-            });
-            document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.getElementById('btn-' + tab).classList.add('tab-active');
-            document.getElementById('btn-' + tab).classList.remove('text-slate-500');
-        }
-    </script>
+function renderAll(){ renderKPIs(); renderTables(); renderCharts(); }
+function setPage(page){
+  currentPage=page;
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+  document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===page));
+  const titles={overview:['OVERVIEW','Physio Therapy Performance Dashboard'],sales:['SALES','Package revenue, product mix, and club sales performance'],trial:['TRIAL CONVERSION','Trial sessions, conversion funnel, and conversion quality'],operations:['OPERATIONS','Session burn, unused sessions, and operational health'],therapists:['THERAPISTS','Therapist productivity and service delivery tracking'],clients:['CLIENTS','Client activity, usage, and renewal risk segmentation'],reports:['REPORTS','Executive summary and export-ready daily report'],settings:['SETTINGS','Dashboard configuration and data source setup']};
+  document.getElementById('pageTitle').textContent=titles[page][0];
+  document.getElementById('pageSubtitle').textContent=titles[page][1];
+  setTimeout(renderAll,60);
+}
+document.querySelectorAll('.nav-item').forEach(x=>x.addEventListener('click',()=>setPage(x.dataset.page)));
+document.getElementById('clubFilter').addEventListener('change',renderAll);
+document.querySelectorAll('[data-club-button]').forEach(btn=>btn.addEventListener('click',()=>{ document.querySelectorAll('[data-club-button]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('clubFilter').value=btn.dataset.clubButton; renderAll(); }));
+renderAll();
+</script>
 </body>
 </html>
