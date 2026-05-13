@@ -30,7 +30,9 @@
     .segmented button.active { background:#008AF5; color:#fff; }
     .date-chip { background:#fff; border:1px solid #dce8f4; border-radius:15px; padding:14px 18px; font-size:14px; font-weight:700; color:#334155; box-shadow:0 10px 25px rgba(15,23,42,.04); }
     .card { background:#fff; border:1px solid #e1ebf5; border-radius:18px; box-shadow:0 10px 26px rgba(15,23,42,.045); }
-    .kpi-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:12px; margin-bottom:14px; }
+    .kpi-grid { display:grid; grid-template-columns:1.8fr 1fr 1fr 1fr; gap:12px; margin-bottom:14px; }
+    .kpi-card:first-child .kpi-value { font-size:28px; white-space:nowrap; letter-spacing:-.045em; }
+    .kpi-card:first-child { padding-right:22px; }
     .kpi-card { padding:16px; display:flex; align-items:center; gap:12px; min-height:108px; }
     .icon-pill { width:42px; height:42px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:#eaf5ff; color:#008AF5; font-weight:900; flex:0 0 42px; }
     .kpi-label { font-size:11px; color:#64748b; font-weight:850; letter-spacing:.02em; }
@@ -93,10 +95,10 @@
       <div>
         <div class="side-label">Date Range</div>
         <select id="dateFilter" class="select">
-          <option value="MAY">May 1 – May 31, 2025</option>
+          <option value="CURRENT">Auto Date Range</option>
         </select>
       </div>
-      <p class="text-xs text-slate-500 leading-relaxed pt-5">Last updated:<br/>May 31, 2025 10:30 AM</p>
+      <p class="text-xs text-slate-500 leading-relaxed pt-5">Last updated:<br/>Loading CSV data...</p>
     </div>
   </aside>
 
@@ -112,7 +114,7 @@
           <button data-club-button="VVO">VVO</button>
           <button class="active" data-club-button="ALL">All Clubs</button>
         </div>
-        <div class="date-chip">May 1 – May 31, 2025 ▾</div>
+        <div class="date-chip">Auto Date Range ▾</div>
       </div>
     </header>
 
@@ -121,8 +123,6 @@
       <div class="card kpi-card"><div class="icon-pill">▢</div><div><div class="kpi-label">PACKAGES SOLD</div><div id="kpiPackages" class="kpi-value">0</div><div class="kpi-change">↑ 16.2%</div></div></div>
       <div class="card kpi-card"><div class="icon-pill">○</div><div><div class="kpi-label">TRIAL SESSIONS</div><div id="kpiTrial" class="kpi-value">0</div><div class="kpi-change">↑ 22.4%</div></div></div>
       <div class="card kpi-card"><div class="icon-pill">〽</div><div><div class="kpi-label">BURN SESSIONS</div><div id="kpiBurn" class="kpi-value">0</div><div class="kpi-change">↑ 15.7%</div></div></div>
-      <div class="card kpi-card"><div class="icon-pill">♟</div><div><div class="kpi-label">ACTIVE CLIENTS</div><div id="kpiClients" class="kpi-value">0</div><div class="kpi-change">↑ 13.3%</div></div></div>
-      <div class="card kpi-card"><div class="icon-pill">$</div><div><div class="kpi-label">AVG REV / CLIENT</div><div id="kpiAvg" class="kpi-value">$0</div><div class="kpi-change">↑ 4.8%</div></div></div>
     </section>
 
     <section id="overview" class="page active">
@@ -134,7 +134,7 @@
       <div class="grid-12 mb-4">
         <div class="card p-4 col-span-4"><div class="section-title"><h3>TRIAL CONVERSION FUNNEL</h3><span>Booked → Burn Active</span></div><div class="chart-md"><canvas id="funnelChart"></canvas></div></div>
         <div class="card p-4 col-span-4"><div class="section-title"><h3>SESSION BURN OVER TIME</h3><span>Burned vs Sold</span></div><div class="chart-md"><canvas id="burnTrendChart"></canvas></div></div>
-        <div class="card col-span-4"><div class="p-4 section-title"><h3>BURN SUMMARY</h3><span>Operational Health</span></div><div class="summary-grid"><div class="summary-item"><p class="text-sm text-slate-500">Total Burned Sessions</p><h4 id="sumBurn1" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-emerald-600 mt-1">↑ 15.7%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Avg Sessions / Client</p><h4 id="sumAvgSS1" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-emerald-600 mt-1">↑ 6.3%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Unused Sessions</p><h4 class="text-2xl font-extrabold mt-1">632</h4><p class="text-xs text-red-500 mt-1">↓ 6.2%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Expiring 30 Days</p><h4 class="text-2xl font-extrabold mt-1">84</h4><p class="text-xs text-red-500 mt-1">↓ 12.5%</p></div></div></div>
+        <div class="card col-span-4"><div class="p-4 section-title"><h3>BURN SUMMARY</h3><span>Real Session Logic</span></div><div class="summary-grid"><div class="summary-item"><p class="text-sm text-slate-500">Total Burned Sessions</p><h4 id="sumBurn1" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-slate-500 mt-1">From booking.csv</p></div><div class="summary-item"><p class="text-sm text-slate-500">Sessions Sold</p><h4 id="sumSoldSessions" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-slate-500 mt-1">From Service Quantity</p></div><div class="summary-item"><p class="text-sm text-slate-500">Remaining Sessions</p><h4 id="sumRemainingSessions" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-slate-500 mt-1">Sold minus burned</p></div><div class="summary-item"><p class="text-sm text-slate-500">Burn Rate</p><h4 id="sumBurnRate" class="text-2xl font-extrabold mt-1">0%</h4><p class="text-xs text-slate-500 mt-1">Burned / sold</p></div></div></div>
       </div>
       <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">DAILY PERFORMANCE SUMMARY</h3><span>Latest 5 days</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Revenue</th><th>Packages Sold</th><th>Trial Sessions</th><th>Burn Sessions</th><th>Conversion Rate</th></tr></thead><tbody id="overviewTable"></tbody></table></div></div>
     </section>
@@ -167,8 +167,8 @@
       </div>
       <div class="grid-12 mb-4">
         <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Burn Ratio</p><h4 id="opsBurnRatio">0%</h4><p class="text-sm text-slate-500 mt-2">Burned sessions / sold session capacity</p></div></div>
-        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Unused Sessions</p><h4>632</h4><p class="text-sm text-slate-500 mt-2">Need proactive booking follow-up</p></div></div>
-        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Expiring Sessions</p><h4>84</h4><p class="text-sm text-slate-500 mt-2">30-day risk pool</p></div></div>
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Sessions Sold</p><h4 id="opsSoldSessions">0</h4><p class="text-sm text-slate-500 mt-2">Total service quantity sold</p></div></div>
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Remaining Sessions</p><h4 id="opsRemainingSessions">0</h4><p class="text-sm text-slate-500 mt-2">Sold sessions minus burned sessions</p></div></div>
       </div>
       <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">OPERATION DETAIL</h3><span>Session burn by date</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Burn Sessions</th><th>Trial Sessions</th><th>Packages Sold</th><th>Status</th></tr></thead><tbody id="operationsTable"></tbody></table></div></div>
     </section>
@@ -191,7 +191,7 @@
     </section>
 
     <section id="reports" class="page">
-      <div class="grid-12 mb-4"><div class="card p-4 col-span-8"><div class="section-title"><h3>REPORT SUMMARY</h3><span>Executive readout</span></div><div class="empty-state"><b>May performance snapshot:</b><br/>Revenue is led by TTC, while VVO shows opportunity to improve trial-to-package conversion. Session burn remains healthy, but unused and expiring sessions require follow-up to protect renewal potential.</div></div><div class="card p-4 col-span-4"><div class="section-title"><h3>EXPORT OPTIONS</h3><span>Manual now</span></div><div class="space-y-3"><button class="w-full rounded-xl bg-[#008AF5] text-white font-bold py-3">Export PDF</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Download CSV</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Send Summary</button></div></div></div>
+      <div class="grid-12 mb-4"><div class="card p-4 col-span-8"><div class="section-title"><h3>REPORT SUMMARY</h3><span>Executive readout</span></div><div class="empty-state"><b>May performance snapshot:</b><br/>Revenue, package sales, trial sessions, and burn sessions are calculated from the CSV files. Remaining sessions are calculated as service quantity sold minus burned sessions.</div></div><div class="card p-4 col-span-4"><div class="section-title"><h3>EXPORT OPTIONS</h3><span>Manual now</span></div><div class="space-y-3"><button class="w-full rounded-xl bg-[#008AF5] text-white font-bold py-3">Export PDF</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Download CSV</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Send Summary</button></div></div></div>
       <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">FULL DAILY REPORT</h3><span>All data</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Product</th><th>Revenue</th><th>Packages</th><th>Trial</th><th>Burn</th><th>Clients</th></tr></thead><tbody id="reportTable"></tbody></table></div></div>
     </section>
 
@@ -201,107 +201,691 @@
   </main>
 </div>
 
+
 <script>
-const rawData = [
-  { date:'May 31, 2025', club:'TTC', product:'Recovery Package', revenue:6450, packages:6, trial:18, burn:142, clients:28 },
-  { date:'May 31, 2025', club:'VVO', product:'Pain Relief', revenue:3920, packages:4, trial:12, burn:98, clients:20 },
-  { date:'May 30, 2025', club:'TTC', product:'Mobility Package', revenue:7890, packages:7, trial:22, burn:168, clients:31 },
-  { date:'May 30, 2025', club:'VVO', product:'Posture & Alignment', revenue:5110, packages:5, trial:15, burn:112, clients:24 },
-  { date:'May 29, 2025', club:'TTC', product:'Recovery Package', revenue:6120, packages:5, trial:16, burn:134, clients:27 },
-  { date:'May 29, 2025', club:'VVO', product:'Sports Performance', revenue:3450, packages:3, trial:11, burn:86, clients:18 },
-  { date:'May 28, 2025', club:'TTC', product:'Pain Relief', revenue:5860, packages:6, trial:14, burn:118, clients:26 },
-  { date:'May 28, 2025', club:'VVO', product:'Mobility Package', revenue:2980, packages:2, trial:9, burn:74, clients:17 },
-  { date:'May 27, 2025', club:'TTC', product:'Posture & Alignment', revenue:6980, packages:6, trial:17, burn:136, clients:30 },
-  { date:'May 27, 2025', club:'VVO', product:'Recovery Package', revenue:4120, packages:4, trial:12, burn:92, clients:19 }
-];
-const therapists = [
-  { name:'Anna', club:'TTC', burn:258, trial:36, packages:18 },
-  { name:'Minh', club:'TTC', burn:226, trial:29, packages:14 },
-  { name:'Linh', club:'VVO', burn:188, trial:27, packages:12 },
-  { name:'David', club:'VVO', burn:176, trial:24, packages:10 }
-];
-const days = Array.from({length:31},(_,i)=>`May ${i+1}`);
-const revenueTrend = [8000,12500,7200,9800,13200,6800,7400,15500,8100,9300,17400,20900,11800,5300,10100,13200,8800,11200,12100,9500,12600,12800,6900,8900,17400,14200,9300,10800,11600,19600,15100];
-const lastMonth = [5200,7400,11000,13200,9800,12700,9100,11200,12600,9800,8500,12800,10100,9200,13400,10700,15000,18100,16800,7400,9200,11100,11900,10700,12900,14200,17000,8900,13800,19700,15200];
-const burnTrend = [180,310,420,510,570,640,720,860,920,1010,1090,1170,1260,1340,1390,1510,1580,1610,1690,1770,1840,1860,1930,2010,2080,2190,2260,2310,2400,2510,2600];
-const soldTrend = burnTrend.map((v,i)=>v+180+i*14);
-const fmt = n => new Intl.NumberFormat('en-US').format(Math.round(n));
-const sum = (arr,k)=>arr.reduce((a,b)=>a+(+b[k]||0),0);
+/* =========================================================
+   California ProPhysio Dashboard
+   Data source: booking.csv + contracts.csv + roster.csv
+   Upload the 3 CSV files into the same GitHub repo as index.html.
+   The dashboard will try local GitHub Pages path first, then raw GitHub.
+========================================================= */
+
+const DATA_SOURCES = {
+  booking: [
+    './booking.csv',
+    'https://raw.githubusercontent.com/dtchien401/ProPhysio-Dashboard/main/booking.csv'
+  ],
+  contracts: [
+    './contracts.csv',
+    'https://raw.githubusercontent.com/dtchien401/ProPhysio-Dashboard/main/contracts.csv'
+  ],
+  roster: [
+    './roster.csv',
+    'https://raw.githubusercontent.com/dtchien401/ProPhysio-Dashboard/main/roster.csv'
+  ]
+};
+
+let state = {
+  booking: [],
+  contracts: [],
+  roster: [],
+  rawData: [],
+  therapists: [],
+  rosterRows: [],
+  days: [],
+  revenueTrend: [],
+  burnTrend: [],
+  soldTrend: [],
+  lastMonth: [],
+  currentPage: 'overview',
+  charts: {},
+  loadStatus: 'Loading CSV data...'
+};
+
+
+const CHART_COLORS = {
+  revenue: '#0E8DF7',
+  revenueSoft: 'rgba(14,141,247,0.16)',
+  burn: '#14B8A6',
+  burnSoft: 'rgba(20,184,166,0.18)',
+  trial: '#8B5CF6',
+  trialSoft: 'rgba(139,92,246,0.18)',
+  package: '#F59E0B',
+  packageSoft: 'rgba(245,158,11,0.22)',
+  capacity: '#EF4444',
+  capacitySoft: 'rgba(239,68,68,0.14)',
+  green: '#10B981',
+  slate: '#64748B',
+  product: ['#0E8DF7','#14B8A6','#8B5CF6','#F59E0B','#EF4444','#06B6D4','#84CC16','#F97316']
+};
+
+const fmt = n => new Intl.NumberFormat('en-US').format(Math.round(Number(n) || 0));
+const money = n => '₫' + fmt(Number(n) || 0);
+const num = v => {
+  if (v === null || v === undefined) return 0;
+  const cleaned = String(v).replace(/[₫,\s]/g,'').replace(/[^\d.-]/g,'');
+  return Number(cleaned) || 0;
+};
+const clean = v => (v === null || v === undefined ? '' : String(v).trim());
+const lower = v => clean(v).toLowerCase();
+const sum = (arr,k)=>arr.reduce((a,b)=>a+(Number(b[k])||0),0);
+const unique = arr => [...new Set(arr.filter(Boolean))];
 const group = (arr,k)=>arr.reduce((a,b)=>((a[b[k]]=(a[b[k]]||[]).concat(b)),a),{});
-let currentPage = 'overview';
-let charts = {};
-function filtered(){ const c=document.getElementById('clubFilter').value; return c==='ALL'?rawData:rawData.filter(d=>d.club===c); }
-function destroy(id){ if(charts[id]) charts[id].destroy(); }
-function makeChart(id, config){ if(!document.getElementById(id)) return; destroy(id); charts[id]=new Chart(document.getElementById(id), config); }
-function baseOptions(extra={}){ return { responsive:true, maintainAspectRatio:false, plugins:{ legend:{labels:{color:'#334155', boxWidth:11, usePointStyle:true}}, tooltip:{backgroundColor:'#fff', titleColor:'#0f172a', bodyColor:'#334155', borderColor:'#dbe8f6', borderWidth:1}}, scales:{x:{ticks:{color:'#64748b', maxRotation:0}, grid:{color:'rgba(15,23,42,.06)'}}, y:{ticks:{color:'#64748b'}, grid:{color:'rgba(15,23,42,.06)'}}}, ...extra }; }
-function productRows(data){ const g=group(data,'product'); return Object.keys(g).map(p=>({product:p,revenue:sum(g[p],'revenue'),packages:sum(g[p],'packages')})).sort((a,b)=>b.revenue-a.revenue); }
-function clubRows(data){ const g=group(data,'club'); return Object.keys(g).map(c=>({club:c,revenue:sum(g[c],'revenue'),packages:sum(g[c],'packages'),trial:sum(g[c],'trial'),burn:sum(g[c],'burn')})); }
+
+function normalizeClub(v){
+  const s = clean(v).toUpperCase();
+  if (s.includes('TTC') || s.includes('MTTC')) return 'TTC';
+  if (s.includes('VVO') || s.includes('MVVO')) return 'VVO';
+  return s || 'UNKNOWN';
+}
+
+function parseDateAny(v){
+  const s = clean(v);
+  if (!s) return null;
+
+  // yyyy-mm-dd
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return new Date(Number(m[1]), Number(m[2])-1, Number(m[3]));
+
+  // dd/mm/yy or dd/mm/yyyy
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if (m) {
+    let y = Number(m[3]);
+    if (y < 100) y += 2000;
+    return new Date(y, Number(m[2])-1, Number(m[1]));
+  }
+
+  // May 31, 2026 etc.
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function toISODate(v){
+  const d = parseDateAny(v);
+  if (!d) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+
+function getField(row, aliases){
+  // Case/space-insensitive lookup because exported CSV headers may vary slightly.
+  const keys = Object.keys(row || {});
+  const norm = v => String(v || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  for (const alias of aliases) {
+    const hit = keys.find(k => norm(k) === norm(alias));
+    if (hit && clean(row[hit])) return row[hit];
+  }
+  return '';
+}
+
+function firstValidDate(row, fields){
+  for (const field of fields) {
+    const iso = toISODate(getField(row, [field]));
+    if (iso) return iso;
+  }
+  return '';
+}
+
+function contractSalesDate(row){
+  // IMPORTANT: Revenue/package date must come from contracts.csv column "Term date".
+  // Do NOT use Start Date or End Date because those are service dates and may be in the future.
+  return firstValidDate(row, [
+    'Term date',
+    'Term Date'
+  ]);
+}
+
+function displayDate(iso){
+  const d = parseDateAny(iso);
+  if (!d) return iso || '-';
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+function minutesFromTime(t){
+  const s = clean(t);
+  const m = s.match(/(\d{1,2}):(\d{2})/);
+  if (!m) return 0;
+  return Number(m[1])*60 + Number(m[2]);
+}
+
+function durationHoursFromRange(range){
+  const parts = clean(range).split('-');
+  if (parts.length < 2) return 1;
+  const start = minutesFromTime(parts[0]);
+  const end = minutesFromTime(parts[1]);
+  const minutes = Math.max(end - start, 0);
+  return minutes > 0 ? minutes / 60 : 1;
+}
+
+function shiftHours(row){
+  const start = minutesFromTime(row.Start);
+  const end = minutesFromTime(row.End);
+  let minutes = Math.max(end - start, 0);
+  const lunch = clean(row['Lunch Break']);
+  if (lunch.includes('-')) {
+    const [l1,l2] = lunch.split('-');
+    minutes -= Math.max(minutesFromTime(l2) - minutesFromTime(l1), 0);
+  }
+  return Math.max(minutes / 60, 0);
+}
+
+/* Robust CSV parser: handles quoted commas and line breaks */
+function parseCSV(text){
+  const rows = [];
+  let row = [], value = '', insideQuotes = false;
+
+  for (let i=0; i<text.length; i++){
+    const c = text[i], next = text[i+1];
+
+    if (c === '"' && insideQuotes && next === '"') {
+      value += '"'; i++;
+    } else if (c === '"') {
+      insideQuotes = !insideQuotes;
+    } else if (c === ',' && !insideQuotes) {
+      row.push(value); value = '';
+    } else if ((c === '\n' || c === '\r') && !insideQuotes) {
+      if (c === '\r' && next === '\n') i++;
+      row.push(value);
+      if (row.some(cell => clean(cell) !== '')) rows.push(row);
+      row = []; value = '';
+    } else {
+      value += c;
+    }
+  }
+
+  if (value.length || row.length) {
+    row.push(value);
+    if (row.some(cell => clean(cell) !== '')) rows.push(row);
+  }
+
+  if (!rows.length) return [];
+  const headers = rows[0].map(h => clean(h));
+  return rows.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = clean(r[i] || ''));
+    return obj;
+  });
+}
+
+async function fetchFirstAvailable(urls){
+  let lastError = '';
+  for (const url of urls) {
+    try {
+      const res = await fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now(), { cache:'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      if (text.trim().startsWith('<!DOCTYPE') || text.includes('<html')) {
+        throw new Error('Received HTML, not CSV');
+      }
+      return { text, url };
+    } catch (err) {
+      lastError = `${url}: ${err.message}`;
+    }
+  }
+  throw new Error(lastError || 'Unable to fetch CSV');
+}
+
+async function loadCSVData(){
+  setLoadStatus('Loading CSV data...');
+  try {
+    const [bookingRes, contractsRes, rosterRes] = await Promise.all([
+      fetchFirstAvailable(DATA_SOURCES.booking),
+      fetchFirstAvailable(DATA_SOURCES.contracts),
+      fetchFirstAvailable(DATA_SOURCES.roster)
+    ]);
+
+    state.booking = parseCSV(bookingRes.text);
+    state.contracts = parseCSV(contractsRes.text);
+    state.roster = parseCSV(rosterRes.text);
+
+    buildDataModel();
+
+    const sourceLine = `Loaded ${state.booking.length} bookings, ${state.contracts.length} contracts, ${state.roster.length} roster rows.`;
+    setLoadStatus(sourceLine);
+    renderAll();
+
+  } catch (err) {
+    console.error(err);
+    setLoadStatus('CSV load failed. Check file names, GitHub Pages path, or raw GitHub links.');
+    buildFallbackData();
+    renderAll();
+  }
+}
+
+function setLoadStatus(msg){
+  state.loadStatus = msg;
+  const sidebarText = document.querySelector('.sidebar p.text-xs');
+  if (sidebarText) {
+    sidebarText.innerHTML = `Data status:<br/>${msg}<br/><br/>Last refresh:<br/>${new Date().toLocaleString('en-US')}`;
+  }
+}
+
+/* Build normalized rows from contracts + booking + roster */
+function buildDataModel(){
+  const contractRows = state.contracts.map(r => ({
+    source: 'contract',
+    date: contractSalesDate(r),
+    club: normalizeClub(r['Billing Club']),
+    client: clean(r['Full Name (S + G) (Client) (Client)']),
+    product: clean(r['Service']) || 'Unknown Service',
+    revenue: num(r['Contract Amount']),
+    packages: clean(r['Contract Number']) ? 1 : 0,
+    contractQty: num(r['Service Quantity']),
+    trial: 0,
+    burn: 0,
+    clients: clean(r['Full Name (S + G) (Client) (Client)']) ? 1 : 0,
+    counselor: clean(r['Counselor']),
+    therapist: ''
+  })).filter(r => r.date || r.revenue || r.packages);
+
+  const bookingRows = state.booking.map(r => {
+    const status = lower(r['Status.1'] || r['Status']);
+    const note = lower(r['Note'] + ' ' + r['Service']);
+    const isCancelled = status.includes('cancel') || note.includes('cancel');
+    const isNoShow = status.includes('no show') || note.includes('no show');
+    const isTrial = note.includes('trial') || note.includes('trải nghiệm') || note.includes('try') || lower(r['Service']).includes('trial');
+    const booked = clean(r['Booking ID']) ? 1 : 0;
+    const attended = booked && !isCancelled && !isNoShow;
+    const hours = durationHoursFromRange(r['Time']);
+    return {
+      source: 'booking',
+      bookingId: clean(r['Booking ID']),
+      date: toISODate(r['Date']),
+      club: normalizeClub(r['Location']),
+      client: clean(r['Member Name']),
+      product: clean(r['Service']) || (isTrial ? 'Trial Session' : 'Physio Session'),
+      revenue: 0,
+      packages: 0,
+      contractQty: 0,
+      trial: isTrial && attended ? 1 : 0,
+      burn: !isTrial && attended ? 1 : 0,
+      booked,
+      cancelled: isCancelled ? 1 : 0,
+      noShow: isNoShow ? 1 : 0,
+      hours: attended ? hours : 0,
+      clients: clean(r['Member Name']) ? 1 : 0,
+      therapist: clean(r['Therapist'])
+    };
+  }).filter(r => r.date);
+
+  state.rawData = [...contractRows, ...bookingRows];
+
+  state.rosterRows = state.roster.map(r => ({
+    date: toISODate(r['Date']),
+    club: normalizeClub(r['Location']),
+    therapist: clean(r['Therapist']),
+    active: lower(r['Active']) === 'yes',
+    availableHours: lower(r['Active']) === 'yes' ? shiftHours(r) : 0,
+    note: clean(r['Note'])
+  })).filter(r => r.date);
+
+  buildDerivedSeries();
+  buildTherapistRows();
+  populateClubOptions();
+}
+
+function buildDerivedSeries(){
+  const allDates = unique(state.rawData.map(x=>x.date)).sort();
+  state.days = allDates.length ? allDates : [];
+  const byDate = group(state.rawData, 'date');
+  state.revenueTrend = state.days.map(d => sum(byDate[d] || [], 'revenue'));
+  state.burnTrend = state.days.map(d => sum(byDate[d] || [], 'burn'));
+  state.soldTrend = state.days.map(d => sum(byDate[d] || [], 'contractQty'));
+  state.lastMonth = state.days.map(()=>0);
+}
+
+function buildTherapistRows(){
+  const bookingRows = state.rawData.filter(x => x.source === 'booking');
+  const byTherapist = group(bookingRows.filter(x=>x.therapist), 'therapist');
+  const rosterByTherapist = group(state.rosterRows.filter(x=>x.therapist), 'therapist');
+
+  state.therapists = unique([...Object.keys(byTherapist), ...Object.keys(rosterByTherapist)]).map(name => {
+    const b = byTherapist[name] || [];
+    const r = rosterByTherapist[name] || [];
+    const club = (b[0] && b[0].club) || (r[0] && r[0].club) || '-';
+    const availableHours = sum(r, 'availableHours');
+    const burn = sum(b, 'burn');
+    const trial = sum(b, 'trial');
+    const packages = 0;
+    const deliveredHours = sum(b, 'hours');
+    return {
+      name,
+      club,
+      burn,
+      trial,
+      packages,
+      deliveredHours,
+      availableHours,
+      utilization: availableHours ? deliveredHours / availableHours * 100 : 0
+    };
+  }).sort((a,b)=>b.burn-a.burn);
+}
+
+function populateClubOptions(){
+  const select = document.getElementById('clubFilter');
+  if (!select) return;
+  const clubs = unique(state.rawData.map(x=>x.club).concat(state.rosterRows.map(x=>x.club))).filter(x=>x !== 'UNKNOWN').sort();
+  const current = select.value || 'ALL';
+  select.innerHTML = `<option value="ALL">All Clubs</option>` + clubs.map(c=>`<option value="${c}">${c}</option>`).join('');
+  select.value = clubs.includes(current) ? current : 'ALL';
+
+  const segmented = document.querySelector('.segmented');
+  if (segmented && clubs.length) {
+    segmented.innerHTML = clubs.map(c=>`<button data-club-button="${c}">${c}</button>`).join('') + `<button class="active" data-club-button="ALL">All Clubs</button>`;
+    document.querySelectorAll('[data-club-button]').forEach(btn=>btn.addEventListener('click',()=> {
+      document.querySelectorAll('[data-club-button]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('clubFilter').value = btn.dataset.clubButton;
+      renderAll();
+    }));
+  }
+
+  const dateChip = document.querySelector('.date-chip');
+  if (dateChip && state.days.length) dateChip.textContent = `${displayDate(state.days[0])} – ${displayDate(state.days[state.days.length-1])} ▾`;
+}
+
+function filtered(){
+  const c = document.getElementById('clubFilter')?.value || 'ALL';
+  return c === 'ALL' ? state.rawData : state.rawData.filter(d => d.club === c);
+}
+
+function filteredRoster(){
+  const c = document.getElementById('clubFilter')?.value || 'ALL';
+  return c === 'ALL' ? state.rosterRows : state.rosterRows.filter(d => d.club === c);
+}
+
+function destroy(id){ if(state.charts[id]) state.charts[id].destroy(); }
+function makeChart(id, config){
+  const el = document.getElementById(id);
+  if(!el) return;
+  destroy(id);
+  state.charts[id] = new Chart(el, config);
+}
+
+function baseOptions(extra={}){
+  return {
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{color:'#334155', boxWidth:11, usePointStyle:true}},
+      tooltip:{backgroundColor:'#fff', titleColor:'#0f172a', bodyColor:'#334155', borderColor:'#dbe8f6', borderWidth:1}
+    },
+    scales:{
+      x:{ticks:{color:'#64748b', maxRotation:0}, grid:{color:'rgba(15,23,42,.06)'}},
+      y:{ticks:{color:'#64748b'}, grid:{color:'rgba(15,23,42,.06)'}}
+    },
+    ...extra
+  };
+}
+
+function productRows(data){
+  const contractData = data.filter(x => x.source === 'contract');
+  const g = group(contractData, 'product');
+  return Object.keys(g).map(p => ({
+    product:p,
+    revenue:sum(g[p],'revenue'),
+    packages:sum(g[p],'packages'),
+    qty:sum(g[p],'contractQty')
+  })).sort((a,b)=>b.revenue-a.revenue);
+}
+
+function clubRows(data){
+  const g = group(data, 'club');
+  return Object.keys(g).map(c => ({
+    club:c,
+    revenue:sum(g[c],'revenue'),
+    packages:sum(g[c],'packages'),
+    trial:sum(g[c],'trial'),
+    burn:sum(g[c],'burn'),
+    qty:sum(g[c],'contractQty')
+  })).sort((a,b)=>b.revenue-a.revenue);
+}
 
 function renderKPIs(){
-  const data=filtered(); const revenue=sum(data,'revenue'), packages=sum(data,'packages'), trial=sum(data,'trial'), burn=sum(data,'burn'), clients=sum(data,'clients');
-  document.getElementById('kpiRevenue').textContent='$'+fmt(revenue);
-  document.getElementById('kpiPackages').textContent=fmt(packages);
-  document.getElementById('kpiTrial').textContent=fmt(trial);
-  document.getElementById('kpiBurn').textContent=fmt(burn);
-  document.getElementById('kpiClients').textContent=fmt(clients);
-  document.getElementById('kpiAvg').textContent='$'+fmt(revenue/Math.max(clients,1));
+  const data = filtered();
+  const roster = filteredRoster();
+  const revenue = sum(data,'revenue');
+  const packages = sum(data,'packages');
+  const trial = sum(data,'trial');
+  const burn = sum(data,'burn');
+  const contractQty = sum(data,'contractQty');
+  const clients = unique(data.map(x=>x.client)).length;
+  const availableHours = sum(roster,'availableHours');
+  const deliveredHours = sum(data,'hours');
+  const avgRevClient = clients ? revenue / clients : 0;
+
+  document.getElementById('kpiRevenue').textContent = money(revenue);
+  document.getElementById('kpiPackages').textContent = fmt(packages);
+  document.getElementById('kpiTrial').textContent = fmt(trial);
+  document.getElementById('kpiBurn').textContent = fmt(burn);
+
+  const remainingSessions = Math.max(contractQty - burn, 0);
+  const burnRate = contractQty ? (burn / contractQty * 100) : 0;
+
   ['sumBurn1'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(burn); });
-  ['sumAvgSS1','clientAvgSS'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=(burn/Math.max(clients,1)).toFixed(2); });
+  ['sumSoldSessions','opsSoldSessions'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(contractQty); });
+  ['sumRemainingSessions','opsRemainingSessions'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(remainingSessions); });
+  ['sumBurnRate','opsBurnRatio'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=burnRate.toFixed(1)+'%'; });
+  ['clientAvgSS'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=(burn/Math.max(clients,1)).toFixed(2); });
+
   const ca=document.getElementById('clientActive'); if(ca) ca.textContent=fmt(clients);
-  const cr=document.getElementById('clientAvgRev'); if(cr) cr.textContent='$'+fmt(revenue/Math.max(clients,1));
-  const br=document.getElementById('opsBurnRatio'); if(br) br.textContent=(burn/Math.max(packages*12,1)*100).toFixed(1)+'%';
+  const cr=document.getElementById('clientAvgRev'); if(cr) cr.textContent=money(avgRevClient);
+
+  // Replace static summary labels if present
+  const miniMetrics = document.querySelectorAll('.mini-metric h4');
+  miniMetrics.forEach(h => {
+    if (h.id === 'opsBurnRatio') return;
+  });
 }
 
 function renderTables(){
-  const data=filtered();
-  const byDate=Object.values(group(data,'date'));
-  const summaryRows=byDate.map(rows=>{ const rev=sum(rows,'revenue'), pkg=sum(rows,'packages'), tr=sum(rows,'trial'), bu=sum(rows,'burn'); return `<tr><td>${rows[0].date}</td><td>$${fmt(rev)}</td><td>${pkg}</td><td>${tr}</td><td>${bu}</td><td>${(pkg/Math.max(tr,1)*100).toFixed(1)}%</td></tr>`; }).join('');
-  ['overviewTable'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=summaryRows; });
-  const detail=data.map(d=>`<tr><td>${d.date}</td><td>${d.club}</td><td>${d.product}</td><td>$${fmt(d.revenue)}</td><td>${d.packages}</td><td>${d.trial}</td><td>${d.burn}</td><td>${d.clients}</td></tr>`).join('');
-  const sales=data.map(d=>`<tr><td>${d.date}</td><td>${d.club}</td><td>${d.product}</td><td>$${fmt(d.revenue)}</td><td>${d.packages}</td><td>${d.trial}</td><td>${d.burn}</td></tr>`).join('');
-  const trial=data.map(d=>`<tr><td>${d.date}</td><td>${d.club}</td><td>${d.trial}</td><td>${d.packages}</td><td>${(d.packages/Math.max(d.trial,1)*100).toFixed(1)}%</td><td>${d.packages/d.trial>.35?'Maintain follow-up rhythm':'Improve post-trial call'}</td></tr>`).join('');
-  const ops=data.map(d=>`<tr><td>${d.date}</td><td>${d.club}</td><td>${d.burn}</td><td>${d.trial}</td><td>${d.packages}</td><td>${d.burn>100?'Healthy':'Needs booking push'}</td></tr>`).join('');
-  const therapistRows=therapists.map(t=>`<tr><td>${t.name}</td><td>${t.club}</td><td>${t.burn}</td><td>${t.trial}</td><td>${t.packages}</td><td>${(t.packages/t.trial*100).toFixed(1)}%</td></tr>`).join('');
-  const map={salesTable:sales, trialTable:trial, operationsTable:ops, reportTable:detail, therapistTable:therapistRows};
+  const data = filtered();
+  const contractData = data.filter(x=>x.source === 'contract');
+  const bookingData = data.filter(x=>x.source === 'booking');
+  const byDate = Object.values(group(data,'date')).sort((a,b)=> b[0].date.localeCompare(a[0].date));
+
+  const summaryRows = byDate.map(rows => {
+    const rev=sum(rows,'revenue'), pkg=sum(rows,'packages'), tr=sum(rows,'trial'), bu=sum(rows,'burn');
+    const conv = tr > 0 ? (pkg / tr * 100) : 0;
+    return `<tr><td>${displayDate(rows[0].date)}</td><td>${money(rev)}</td><td>${pkg}</td><td>${tr}</td><td>${bu}</td><td>${conv.toFixed(1)}%</td></tr>`;
+  }).join('');
+
+  const overviewEl = document.getElementById('overviewTable');
+  if (overviewEl) overviewEl.innerHTML = summaryRows || `<tr><td colspan="6">No data available</td></tr>`;
+
+  const sales = contractData.sort((a,b)=>b.date.localeCompare(a.date)).map(d =>
+    `<tr><td>${displayDate(d.date)}</td><td>${d.club}</td><td>${d.product}</td><td>${money(d.revenue)}</td><td>${d.packages}</td><td>0</td><td>${d.contractQty}</td></tr>`
+  ).join('');
+
+  const trial = bookingData.sort((a,b)=>b.date.localeCompare(a.date)).map(d =>
+    `<tr><td>${displayDate(d.date)}</td><td>${d.club}</td><td>${d.trial}</td><td>0</td><td>${d.trial ? 'Open' : '-'}</td><td>${d.trial ? 'Call within 24 hours after trial' : 'Track normal booking usage'}</td></tr>`
+  ).join('');
+
+  const ops = bookingData.sort((a,b)=>b.date.localeCompare(a.date)).map(d =>
+    `<tr><td>${displayDate(d.date)}</td><td>${d.club}</td><td>${d.burn}</td><td>${d.trial}</td><td>0</td><td>${d.cancelled ? 'Cancelled' : d.burn || d.trial ? 'Booked' : 'Check'}</td></tr>`
+  ).join('');
+
+  const detail = data.sort((a,b)=>b.date.localeCompare(a.date)).map(d =>
+    `<tr><td>${displayDate(d.date)}</td><td>${d.club}</td><td>${d.product}</td><td>${money(d.revenue)}</td><td>${d.packages}</td><td>${d.trial}</td><td>${d.burn}</td><td>${d.client || '-'}</td></tr>`
+  ).join('');
+
+  const therapistRows = state.therapists.map(t =>
+    `<tr><td>${t.name}</td><td>${t.club}</td><td>${t.burn}</td><td>${t.trial}</td><td>${t.packages}</td><td>${t.utilization.toFixed(1)}%</td></tr>`
+  ).join('');
+
+  const map = {
+    salesTable: sales || `<tr><td colspan="7">No contract data available</td></tr>`,
+    trialTable: trial || `<tr><td colspan="6">No booking data available</td></tr>`,
+    operationsTable: ops || `<tr><td colspan="6">No operation data available</td></tr>`,
+    reportTable: detail || `<tr><td colspan="8">No data available</td></tr>`,
+    therapistTable: therapistRows || `<tr><td colspan="6">No therapist data available</td></tr>`
+  };
   Object.entries(map).forEach(([id,html])=>{ const el=document.getElementById(id); if(el) el.innerHTML=html; });
 }
 
 function renderCharts(){
-  const data=filtered(); const products=productRows(data); const clubs=clubRows(rawData);
-  makeChart('revenueTrendChart',{type:'bar',data:{labels:days,datasets:[{label:'This Month',data:revenueTrend,backgroundColor:'#008AF5',borderRadius:5},{label:'Last Month',data:lastMonth,type:'line',borderColor:'#008AF5',borderDash:[5,5],pointRadius:0,tension:.35}]},options:baseOptions({scales:{x:{ticks:{color:'#64748b',autoSkip:true,maxTicksLimit:8},grid:{color:'rgba(15,23,42,.06)'}},y:{ticks:{color:'#64748b',callback:v=>'$'+(v/1000)+'K'},grid:{color:'rgba(15,23,42,.06)'}}}})});
-  makeChart('clubChart',{type:'bar',data:{labels:clubs.map(x=>x.club),datasets:[{label:'Revenue',data:clubs.map(x=>x.revenue),backgroundColor:'#008AF5',borderRadius:7}]},options:baseOptions({indexAxis:'y',scales:{x:{ticks:{color:'#64748b',callback:v=>'$'+fmt(v)},grid:{color:'rgba(15,23,42,.06)'}},y:{ticks:{color:'#64748b'},grid:{display:false}}}})});
-  makeChart('productMixChart',{type:'doughnut',data:{labels:products.map(x=>x.product),datasets:[{data:products.map(x=>x.revenue),backgroundColor:['#008AF5','#1d9bff','#38bdf8','#0f70d7','#8bc9ff'],borderColor:'#fff',borderWidth:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#334155',boxWidth:10,usePointStyle:true}}}}});
-  makeChart('funnelChart',{type:'bar',data:{labels:['Trial Booked','Trial Attended','Package Sold','Burn Active'],datasets:[{data:[312,242,128,115],backgroundColor:['#008AF5','#1894f7','#38a8ff','#8bc9ff'],borderRadius:8}]},options:baseOptions({indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:{color:'#334155'},grid:{display:false}}}})});
-  makeChart('burnTrendChart',{type:'line',data:{labels:days,datasets:[{label:'Burned Sessions',data:burnTrend,borderColor:'#008AF5',pointRadius:0,tension:.35,borderWidth:3},{label:'Sold Sessions',data:soldTrend,borderColor:'#008AF5',borderDash:[5,5],pointRadius:0,tension:.35}]},options:baseOptions({scales:{x:{ticks:{color:'#64748b',autoSkip:true,maxTicksLimit:8},grid:{color:'rgba(15,23,42,.06)'}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(15,23,42,.06)'}}}})});
-  makeChart('salesProductRevenueChart',{type:'bar',data:{labels:products.map(x=>x.product),datasets:[{label:'Revenue',data:products.map(x=>x.revenue),backgroundColor:'#008AF5',borderRadius:8}]},options:baseOptions({indexAxis:'y'})});
-  makeChart('salesPackageChart',{type:'bar',data:{labels:products.map(x=>x.product),datasets:[{label:'Packages Sold',data:products.map(x=>x.packages),backgroundColor:'#38bdf8',borderRadius:8}]},options:baseOptions()});
-  makeChart('salesClubChart',{type:'bar',data:{labels:clubs.map(x=>x.club),datasets:[{label:'Revenue',data:clubs.map(x=>x.revenue),backgroundColor:'#008AF5',borderRadius:8},{label:'Packages',data:clubs.map(x=>x.packages*1000),backgroundColor:'#8bc9ff',borderRadius:8}]},options:baseOptions()});
-  makeChart('trialFunnelChart',{type:'bar',data:{labels:['Booked','Attended','Sold','Burn Active'],datasets:[{data:[312,242,128,115],backgroundColor:'#008AF5',borderRadius:8}]},options:baseOptions({indexAxis:'y',plugins:{legend:{display:false}}})});
-  makeChart('trialClubChart',{type:'bar',data:{labels:clubs.map(x=>x.club),datasets:[{label:'Trial Sessions',data:clubs.map(x=>x.trial),backgroundColor:'#008AF5',borderRadius:8}]},options:baseOptions()});
-  makeChart('conversionClubChart',{type:'bar',data:{labels:clubs.map(x=>x.club),datasets:[{label:'Conversion %',data:clubs.map(x=>(x.packages/Math.max(x.trial,1)*100).toFixed(1)),backgroundColor:'#10b981',borderRadius:8}]},options:baseOptions({scales:{x:{ticks:{color:'#64748b'},grid:{display:false}},y:{ticks:{color:'#64748b',callback:v=>v+'%'},grid:{color:'rgba(15,23,42,.06)'}}}})});
-  makeChart('operationsBurnTrendChart',{type:'line',data:{labels:days,datasets:[{label:'Burned Sessions',data:burnTrend,borderColor:'#008AF5',pointRadius:0,tension:.35,borderWidth:3},{label:'Sold Sessions',data:soldTrend,borderColor:'#38bdf8',pointRadius:0,tension:.35,borderWidth:2}]},options:baseOptions()});
-  makeChart('operationsBurnClubChart',{type:'bar',data:{labels:clubs.map(x=>x.club),datasets:[{label:'Burn Sessions',data:clubs.map(x=>x.burn),backgroundColor:'#008AF5',borderRadius:8}]},options:baseOptions()});
-  makeChart('therapistChart',{type:'bar',data:{labels:therapists.map(x=>x.name),datasets:[{label:'Burn Sessions',data:therapists.map(x=>x.burn),backgroundColor:'#008AF5',borderRadius:8},{label:'Trial Sessions',data:therapists.map(x=>x.trial),backgroundColor:'#8bc9ff',borderRadius:8}]},options:baseOptions()});
+  const data = filtered();
+  const roster = filteredRoster();
+  const products = productRows(data);
+  const clubs = clubRows(data);
 
-  const topProduct=products[0]; const bestClub=clubs.sort((a,b)=>b.revenue-a.revenue)[0];
-  const tp=document.getElementById('topProductText'); if(tp&&topProduct) tp.textContent=`${topProduct.product} — $${fmt(topProduct.revenue)}`;
-  const bc=document.getElementById('bestClubText'); if(bc&&bestClub) bc.textContent=`${bestClub.club} — $${fmt(bestClub.revenue)}`;
+  const dateRows = state.days.map(d => {
+    const rows = data.filter(x => x.date === d);
+    return {
+      date: d,
+      revenue: sum(rows,'revenue'),
+      burn: sum(rows,'burn'),
+      qty: sum(rows,'contractQty'),
+      trial: sum(rows,'trial')
+    };
+  });
+
+  makeChart('revenueTrendChart',{
+    type:'bar',
+    data:{
+      labels:dateRows.map(x=>displayDate(x.date)),
+      datasets:[
+        {label:'Revenue',data:dateRows.map(x=>x.revenue),backgroundColor:CHART_COLORS.revenue,borderRadius:6},
+        {label:'Burn Sessions',data:dateRows.map(x=>x.burn),type:'line',borderColor:CHART_COLORS.burn,backgroundColor:CHART_COLORS.burnSoft,pointRadius:3,pointBackgroundColor:CHART_COLORS.burn,tension:.35,yAxisID:'y1',borderWidth:3}
+      ]
+    },
+    options:baseOptions({
+      scales:{
+        x:{ticks:{color:'#64748b',autoSkip:true,maxTicksLimit:8},grid:{color:'rgba(15,23,42,.06)'}},
+        y:{ticks:{color:'#64748b',callback:v=>'₫'+(v/1000000).toFixed(0)+'M'},grid:{color:'rgba(15,23,42,.06)'}},
+        y1:{position:'right',ticks:{color:'#64748b'},grid:{drawOnChartArea:false}}
+      }
+    })
+  });
+
+  makeChart('clubChart',{
+    type:'bar',
+    data:{labels:clubs.map(x=>x.club),datasets:[{label:'Revenue',data:clubs.map(x=>x.revenue),backgroundColor:clubs.map((_,i)=>CHART_COLORS.product[i % CHART_COLORS.product.length]),borderRadius:7}]},
+    options:baseOptions({indexAxis:'y',scales:{x:{ticks:{color:'#64748b',callback:v=>'₫'+(v/1000000).toFixed(1)+'M'},grid:{color:'rgba(15,23,42,.06)'}},y:{ticks:{color:'#64748b'},grid:{display:false}}}})
+  });
+
+  makeChart('productMixChart',{
+    type:'doughnut',
+    data:{labels:products.map(x=>x.product),datasets:[{data:products.map(x=>x.revenue),backgroundColor:CHART_COLORS.product,borderColor:'#fff',borderWidth:4}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#334155',boxWidth:10,usePointStyle:true}}}}
+  });
+
+  const totalBooked = sum(data,'booked');
+  const totalTrial = sum(data,'trial');
+  const totalPackages = sum(data,'packages');
+  const totalBurn = sum(data,'burn');
+
+  makeChart('funnelChart',{
+    type:'bar',
+    data:{labels:['Booked','Trial','Package Sold','Burn Active'],datasets:[{data:[totalBooked,totalTrial,totalPackages,totalBurn],backgroundColor:[CHART_COLORS.revenue,CHART_COLORS.trial,CHART_COLORS.package,CHART_COLORS.burn],borderRadius:8}]},
+    options:baseOptions({indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#64748b'},grid:{color:'rgba(15,23,42,.06)'}},y:{ticks:{color:'#334155'},grid:{display:false}}}})
+  });
+
+  makeChart('burnTrendChart',{
+    type:'line',
+    data:{labels:dateRows.map(x=>displayDate(x.date)),datasets:[{label:'Burn Sessions',data:dateRows.map(x=>x.burn),borderColor:CHART_COLORS.burn,backgroundColor:CHART_COLORS.burnSoft,pointRadius:3,pointBackgroundColor:CHART_COLORS.burn,tension:.35,borderWidth:3},{label:'Sold Session Capacity',data:dateRows.map(x=>x.qty),borderColor:CHART_COLORS.capacity,backgroundColor:CHART_COLORS.capacitySoft,borderDash:[5,5],pointRadius:3,pointBackgroundColor:CHART_COLORS.capacity,tension:.35,borderWidth:3}]},
+    options:baseOptions({scales:{x:{ticks:{color:'#64748b',autoSkip:true,maxTicksLimit:8},grid:{color:'rgba(15,23,42,.06)'}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(15,23,42,.06)'}}}})
+  });
+
+  makeChart('salesProductRevenueChart',{
+    type:'bar',
+    data:{labels:products.map(x=>x.product),datasets:[{label:'Revenue',data:products.map(x=>x.revenue),backgroundColor:products.map((_,i)=>CHART_COLORS.product[i % CHART_COLORS.product.length]),borderRadius:8}]},
+    options:baseOptions({indexAxis:'y',scales:{x:{ticks:{color:'#64748b',callback:v=>'₫'+(v/1000000).toFixed(1)+'M'},grid:{color:'rgba(15,23,42,.06)'}},y:{ticks:{color:'#64748b'},grid:{display:false}}}})
+  });
+
+  makeChart('salesPackageChart',{
+    type:'bar',
+    data:{labels:products.map(x=>x.product),datasets:[{label:'Packages Sold',data:products.map(x=>x.packages),backgroundColor:CHART_COLORS.package,borderRadius:8},{label:'Service Qty',data:products.map(x=>x.qty),backgroundColor:CHART_COLORS.burn,borderRadius:8}]},
+    options:baseOptions()
+  });
+
+  makeChart('salesClubChart',{
+    type:'bar',
+    data:{labels:clubs.map(x=>x.club),datasets:[{label:'Revenue',data:clubs.map(x=>x.revenue),backgroundColor:CHART_COLORS.revenue,borderRadius:8},{label:'Packages x 1M',data:clubs.map(x=>x.packages*1000000),backgroundColor:CHART_COLORS.package,borderRadius:8}]},
+    options:baseOptions({scales:{x:{ticks:{color:'#64748b'},grid:{display:false}},y:{ticks:{color:'#64748b',callback:v=>'₫'+(v/1000000).toFixed(0)+'M'},grid:{color:'rgba(15,23,42,.06)'}}}})
+  });
+
+  makeChart('trialFunnelChart',{
+    type:'bar',
+    data:{labels:['Booked','Trial','Package Sold','Burn Active'],datasets:[{data:[totalBooked,totalTrial,totalPackages,totalBurn],backgroundColor:[CHART_COLORS.slate,CHART_COLORS.trial,CHART_COLORS.package,CHART_COLORS.burn],borderRadius:8}]},
+    options:baseOptions({indexAxis:'y',plugins:{legend:{display:false}}})
+  });
+
+  makeChart('trialClubChart',{
+    type:'bar',
+    data:{labels:clubs.map(x=>x.club),datasets:[{label:'Trial Sessions',data:clubs.map(x=>x.trial),backgroundColor:CHART_COLORS.trial,borderRadius:8}]},
+    options:baseOptions()
+  });
+
+  makeChart('conversionClubChart',{
+    type:'bar',
+    data:{labels:clubs.map(x=>x.club),datasets:[{label:'Contract / Trial %',data:clubs.map(x=>(x.trial > 0 ? x.packages/x.trial*100 : 0).toFixed(1)),backgroundColor:CHART_COLORS.green,borderRadius:8}]},
+    options:baseOptions({scales:{x:{ticks:{color:'#64748b'},grid:{display:false}},y:{ticks:{color:'#64748b',callback:v=>v+'%'},grid:{color:'rgba(15,23,42,.06)'}}}})
+  });
+
+  makeChart('operationsBurnTrendChart',{
+    type:'line',
+    data:{labels:dateRows.map(x=>displayDate(x.date)),datasets:[{label:'Burn Sessions',data:dateRows.map(x=>x.burn),borderColor:CHART_COLORS.burn,backgroundColor:CHART_COLORS.burnSoft,pointRadius:3,pointBackgroundColor:CHART_COLORS.burn,tension:.35,borderWidth:3},{label:'Trial Sessions',data:dateRows.map(x=>x.trial),borderColor:CHART_COLORS.trial,backgroundColor:CHART_COLORS.trialSoft,pointRadius:3,pointBackgroundColor:CHART_COLORS.trial,tension:.35,borderWidth:3}]},
+    options:baseOptions()
+  });
+
+  makeChart('operationsBurnClubChart',{
+    type:'bar',
+    data:{labels:clubs.map(x=>x.club),datasets:[{label:'Burn Sessions',data:clubs.map(x=>x.burn),backgroundColor:CHART_COLORS.burn,borderRadius:8},{label:'Trial Sessions',data:clubs.map(x=>x.trial),backgroundColor:CHART_COLORS.trial,borderRadius:8}]},
+    options:baseOptions()
+  });
+
+  makeChart('therapistChart',{
+    type:'bar',
+    data:{labels:state.therapists.map(x=>x.name),datasets:[{label:'Burn Sessions',data:state.therapists.map(x=>x.burn),backgroundColor:CHART_COLORS.burn,borderRadius:8},{label:'Utilization %',data:state.therapists.map(x=>x.utilization),backgroundColor:CHART_COLORS.green,borderRadius:8}]},
+    options:baseOptions()
+  });
+
+  const topProduct = products[0];
+  const bestClub = clubs[0];
+  const tp=document.getElementById('topProductText'); if(tp) tp.textContent = topProduct ? `${topProduct.product} — ${money(topProduct.revenue)}` : '-';
+  const bc=document.getElementById('bestClubText'); if(bc) bc.textContent = bestClub ? `${bestClub.club} — ${money(bestClub.revenue)}` : '-';
 }
 
 function renderAll(){ renderKPIs(); renderTables(); renderCharts(); }
+
 function setPage(page){
-  currentPage=page;
+  state.currentPage = page;
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
   document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===page));
-  const titles={overview:['OVERVIEW','Physio Therapy Performance Dashboard'],sales:['SALES','Package revenue, product mix, and club sales performance'],trial:['TRIAL CONVERSION','Trial sessions, conversion funnel, and conversion quality'],operations:['OPERATIONS','Session burn, unused sessions, and operational health'],therapists:['THERAPISTS','Therapist productivity and service delivery tracking'],clients:['CLIENTS','Client activity, usage, and renewal risk segmentation'],reports:['REPORTS','Executive summary and export-ready daily report'],settings:['SETTINGS','Dashboard configuration and data source setup']};
-  document.getElementById('pageTitle').textContent=titles[page][0];
-  document.getElementById('pageSubtitle').textContent=titles[page][1];
+  const titles = {
+    overview:['OVERVIEW','Physio Therapy Performance Dashboard'],
+    sales:['SALES','Package revenue, product mix, and club sales performance'],
+    trial:['TRIAL CONVERSION','Trial sessions, conversion funnel, and conversion quality'],
+    operations:['OPERATIONS','Session burn, session capacity, and operational health'],
+    therapists:['THERAPISTS','Therapist productivity and service delivery tracking'],
+    clients:['CLIENTS','Client activity, usage, and renewal risk segmentation'],
+    reports:['REPORTS','Executive summary and export-ready daily report'],
+    settings:['SETTINGS','Dashboard configuration and data source setup']
+  };
+  document.getElementById('pageTitle').textContent = titles[page][0];
+  document.getElementById('pageSubtitle').textContent = titles[page][1];
   setTimeout(renderAll,60);
 }
+
+function buildFallbackData(){
+  state.rawData = [];
+  state.rosterRows = [];
+  state.therapists = [];
+  state.days = [];
+}
+
 document.querySelectorAll('.nav-item').forEach(x=>x.addEventListener('click',()=>setPage(x.dataset.page)));
-document.getElementById('clubFilter').addEventListener('change',renderAll);
-document.querySelectorAll('[data-club-button]').forEach(btn=>btn.addEventListener('click',()=>{ document.querySelectorAll('[data-club-button]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.getElementById('clubFilter').value=btn.dataset.clubButton; renderAll(); }));
-renderAll();
+document.getElementById('clubFilter').addEventListener('change',()=>{
+  document.querySelectorAll('[data-club-button]').forEach(b=>b.classList.toggle('active', b.dataset.clubButton === document.getElementById('clubFilter').value));
+  renderAll();
+});
+
+loadCSVData();
 </script>
+
 </body>
 </html>
