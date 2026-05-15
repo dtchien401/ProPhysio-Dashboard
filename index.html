@@ -127,14 +127,45 @@
 
     <section id="overview" class="page active">
       <div class="grid-12 mb-4">
-        <div class="card p-4 col-span-5"><div class="section-title"><h3>REVENUE TREND</h3><span>This Month vs Last Month</span></div><div class="chart-lg"><canvas id="revenueTrendChart"></canvas></div></div>
+        <div class="card p-4 col-span-5"><div class="section-title"><h3>REVENUE TREND</h3><span>Daily Revenue + Accumulated MTD</span></div><div class="chart-lg"><canvas id="revenueTrendChart"></canvas></div></div>
         <div class="card p-4 col-span-3"><div class="section-title"><h3>REVENUE BY CLUB</h3><span>Revenue</span></div><div class="chart-lg"><canvas id="clubChart"></canvas></div></div>
         <div class="card p-4 col-span-4"><div class="section-title"><h3>REVENUE BY PRODUCT</h3><span>Mix</span></div><div class="chart-lg"><canvas id="productMixChart"></canvas></div></div>
       </div>
       <div class="grid-12 mb-4">
         <div class="card p-4 col-span-4"><div class="section-title"><h3>TRIAL CONVERSION FUNNEL</h3><span>Booked → Burn Active</span></div><div class="chart-md"><canvas id="funnelChart"></canvas></div></div>
-        <div class="card p-4 col-span-4"><div class="section-title"><h3>SESSION BURN OVER TIME</h3><span>Burned vs Sold</span></div><div class="chart-md"><canvas id="burnTrendChart"></canvas></div></div>
-        <div class="card col-span-4"><div class="p-4 section-title"><h3>BURN SUMMARY</h3><span>Operational Health</span></div><div class="summary-grid"><div class="summary-item"><p class="text-sm text-slate-500">Total Burned Sessions</p><h4 id="sumBurn1" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-emerald-600 mt-1">↑ 15.7%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Avg Sessions / Client</p><h4 id="sumAvgSS1" class="text-2xl font-extrabold mt-1">0</h4><p class="text-xs text-emerald-600 mt-1">↑ 6.3%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Unused Sessions</p><h4 class="text-2xl font-extrabold mt-1">632</h4><p class="text-xs text-red-500 mt-1">↓ 6.2%</p></div><div class="summary-item"><p class="text-sm text-slate-500">Expiring 30 Days</p><h4 class="text-2xl font-extrabold mt-1">84</h4><p class="text-xs text-red-500 mt-1">↓ 12.5%</p></div></div></div>
+        <div class="card p-5 col-span-8">
+          <div class="section-title"><h3>SESSION INVENTORY SUMMARY</h3><span>Sold vs Burn</span></div>
+          <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-5 min-h-[172px] flex flex-col justify-between">
+              <div>
+                <p class="text-xs text-slate-500 font-extrabold uppercase tracking-wide">Total Sessions Sold</p>
+                <h4 id="sessionSoldTotal" class="text-4xl font-extrabold mt-4 text-slate-900 leading-none">0</h4>
+              </div>
+              <p class="text-sm text-slate-400 font-semibold">Contract service quantity</p>
+            </div>
+            <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-5 min-h-[172px] flex flex-col justify-between">
+              <div>
+                <p class="text-xs text-emerald-600 font-extrabold uppercase tracking-wide">Total Sessions Burned</p>
+                <h4 id="sessionBurnTotal" class="text-4xl font-extrabold mt-4 text-slate-900 leading-none">0</h4>
+              </div>
+              <p class="text-sm text-emerald-500 font-semibold">Actual delivered sessions</p>
+            </div>
+            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-5 min-h-[172px] flex flex-col justify-between">
+              <div>
+                <p class="text-xs text-slate-500 font-extrabold uppercase tracking-wide">Avg SS / Contract</p>
+                <h4 id="avgSSContract" class="text-4xl font-extrabold mt-4 text-slate-900 leading-none">0</h4>
+              </div>
+              <p class="text-sm text-slate-400 font-semibold">Sold sessions / contracts</p>
+            </div>
+            <div class="rounded-2xl bg-red-50 border border-red-100 p-5 min-h-[172px] flex flex-col justify-between">
+              <div>
+                <p class="text-xs text-red-500 font-extrabold uppercase tracking-wide">Unused Sessions</p>
+                <h4 id="unusedSessions" class="text-4xl font-extrabold mt-4 text-red-600 leading-none">0</h4>
+              </div>
+              <p class="text-sm text-red-400 font-semibold">Need booking follow-up</p>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">DAILY PERFORMANCE SUMMARY</h3><span>Latest 5 days</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Revenue</th><th>Packages Sold</th><th>Trial Sessions</th><th>Burn Sessions</th><th>Conversion Rate</th></tr></thead><tbody id="overviewTable"></tbody></table></div></div>
     </section>
@@ -662,6 +693,8 @@ function renderKPIs(){
   const trial = sum(data,'trial');
   const burn = sum(data,'burn');
   const contractQty = sum(data,'contractQty');
+  const unusedSessions = Math.max(contractQty - burn, 0);
+  const avgSSContract = packages ? contractQty / packages : 0;
   const clients = unique(data.map(x=>x.client)).length;
   const availableHours = sum(roster,'availableHours');
   const deliveredHours = sum(data,'hours');
@@ -671,6 +704,11 @@ function renderKPIs(){
   document.getElementById('kpiPackages').textContent = fmt(packages);
   document.getElementById('kpiTrial').textContent = fmt(trial);
   document.getElementById('kpiBurn').textContent = fmt(burn);
+
+  const ssSoldEl = document.getElementById('sessionSoldTotal'); if (ssSoldEl) ssSoldEl.textContent = fmt(contractQty);
+  const ssBurnEl = document.getElementById('sessionBurnTotal'); if (ssBurnEl) ssBurnEl.textContent = fmt(burn);
+  const avgSSContractEl = document.getElementById('avgSSContract'); if (avgSSContractEl) avgSSContractEl.textContent = avgSSContract.toFixed(1);
+  const unusedEl = document.getElementById('unusedSessions'); if (unusedEl) unusedEl.textContent = fmt(unusedSessions);
 
   ['sumBurn1'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(burn); });
   ['sumAvgSS1','clientAvgSS'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=(burn/Math.max(clients,1)).toFixed(2); });
@@ -748,20 +786,43 @@ function renderCharts(){
     };
   });
 
+  const accumulatedRevenue = [];
+  let runningRevenue = 0;
+  dateRows.forEach(x => {
+    runningRevenue += Number(x.revenue) || 0;
+    accumulatedRevenue.push(runningRevenue);
+  });
+
   makeChart('revenueTrendChart',{
     type:'bar',
     data:{
       labels:dateRows.map(x=>displayDate(x.date)),
       datasets:[
-        {label:'Revenue',data:dateRows.map(x=>x.revenue),backgroundColor:CHART_COLORS.revenue,borderRadius:6},
-        {label:'Burn Sessions',data:dateRows.map(x=>x.burn),type:'line',borderColor:CHART_COLORS.burn,backgroundColor:CHART_COLORS.burnSoft,pointRadius:3,pointBackgroundColor:CHART_COLORS.burn,tension:.35,yAxisID:'y1',borderWidth:3}
+        {
+          label:'Daily Revenue',
+          data:dateRows.map(x=>x.revenue),
+          backgroundColor:CHART_COLORS.revenue,
+          borderRadius:6,
+          order:2
+        },
+        {
+          label:'Accumulated Revenue',
+          data:accumulatedRevenue,
+          type:'line',
+          borderColor:CHART_COLORS.burn,
+          backgroundColor:CHART_COLORS.burnSoft,
+          pointRadius:3,
+          pointBackgroundColor:CHART_COLORS.burn,
+          tension:.35,
+          borderWidth:3,
+          order:1
+        }
       ]
     },
     options:baseOptions({
       scales:{
         x:{ticks:{color:'#64748b',autoSkip:true,maxTicksLimit:8},grid:{color:'rgba(15,23,42,.06)'}},
-        y:{ticks:{color:'#64748b',callback:v=>'₫'+(v/1000000).toFixed(0)+'M'},grid:{color:'rgba(15,23,42,.06)'}},
-        y1:{position:'right',ticks:{color:'#64748b'},grid:{drawOnChartArea:false}}
+        y:{ticks:{color:'#64748b',callback:v=>'₫'+(v/1000000).toFixed(0)+'M'},grid:{color:'rgba(15,23,42,.06)'}}
       }
     })
   });
