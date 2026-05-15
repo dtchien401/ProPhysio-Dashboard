@@ -21,6 +21,7 @@
     .nav-icon { width:22px; text-align:center; opacity:.9; }
     .side-label { font-size:12px; font-weight:850; letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px; color:#0f172a; }
     .select { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:16px; padding:13px 14px; outline:none; color:#0f172a; font-weight:650; }
+    .sidebar-timeframe { margin-top:22px; padding-top:18px; border-top:1px solid #edf2f7; }
     .date-control { display:none; margin-top:10px; }
     .date-control.active { display:block; }
     .date-control-grid { display:grid; grid-template-columns:1fr; gap:10px; margin-top:10px; }
@@ -86,18 +87,16 @@
         <div class="nav-item" data-page="reports"><span class="nav-icon">□</span>Reports</div>
         <div class="nav-item" data-page="settings"><span class="nav-icon">⚙</span>Settings</div>
       </nav>
-    </div>
 
-    <div class="space-y-5">
-      <div>
-        <div class="side-label">Club Filter</div>
-        <select id="clubFilter" class="select">
-          <option value="ALL">All Clubs</option>
-          <option value="TTC">TTC</option>
-          <option value="VVO">VVO</option>
-        </select>
-      </div>
-      <div>
+      <!-- Club filter is controlled by the segmented buttons on the top-right.
+           Keep this hidden select so existing filter logic continues to work. -->
+      <select id="clubFilter" class="hidden">
+        <option value="ALL">All Clubs</option>
+        <option value="TTC">TTC</option>
+        <option value="VVO">VVO</option>
+      </select>
+
+      <div class="sidebar-timeframe">
         <div class="side-label">Time Frame</div>
         <select id="dateFilter" class="select">
           <option value="AUTO">Auto Date Range</option>
@@ -113,6 +112,9 @@
         </div>
         <div class="date-hint">Auto = full available data. Single Day = one exact day. From - To = custom range.</div>
       </div>
+    </div>
+
+    <div class="space-y-5">
       <p class="text-xs text-slate-500 leading-relaxed pt-5">Last updated:<br/>Loading CSV data...</p>
     </div>
   </aside>
