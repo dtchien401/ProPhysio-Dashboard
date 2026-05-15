@@ -21,6 +21,11 @@
     .nav-icon { width:22px; text-align:center; opacity:.9; }
     .side-label { font-size:12px; font-weight:850; letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px; color:#0f172a; }
     .select { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:16px; padding:13px 14px; outline:none; color:#0f172a; font-weight:650; }
+    .date-control { display:none; margin-top:10px; }
+    .date-control.active { display:block; }
+    .date-control-grid { display:grid; grid-template-columns:1fr; gap:10px; margin-top:10px; }
+    .date-input { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:14px; padding:11px 12px; outline:none; color:#0f172a; font-weight:650; font-size:13px; }
+    .date-hint { font-size:11px; line-height:1.35; color:#94a3b8; margin-top:8px; font-weight:650; }
     .main { flex:1; padding:24px; min-width:0; }
     .topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:18px; }
     .page-title { font-size:30px; line-height:1.1; font-weight:850; letter-spacing:-.04em; }
@@ -93,10 +98,20 @@
         </select>
       </div>
       <div>
-        <div class="side-label">Date Range</div>
+        <div class="side-label">Time Frame</div>
         <select id="dateFilter" class="select">
-          <option value="CURRENT">Auto Date Range</option>
+          <option value="AUTO">Auto Date Range</option>
+          <option value="DAY">Single Day</option>
+          <option value="RANGE">From - To</option>
         </select>
+        <div id="singleDayControl" class="date-control">
+          <input id="singleDate" type="date" class="date-input" />
+        </div>
+        <div id="rangeControl" class="date-control-grid date-control">
+          <input id="fromDate" type="date" class="date-input" />
+          <input id="toDate" type="date" class="date-input" />
+        </div>
+        <div class="date-hint">Auto = full available data. Single Day = one exact day. From - To = custom range.</div>
       </div>
       <p class="text-xs text-slate-500 leading-relaxed pt-5">Last updated:<br/>Loading CSV data...</p>
     </div>
@@ -114,7 +129,7 @@
           <button data-club-button="VVO">VVO</button>
           <button class="active" data-club-button="ALL">All Clubs</button>
         </div>
-        <div class="date-chip">Auto Date Range ▾</div>
+        <div id="dateChip" class="date-chip">Auto Date Range ▾</div>
       </div>
     </header>
 
@@ -624,18 +639,81 @@ function populateClubOptions(){
     }));
   }
 
-  const dateChip = document.querySelector('.date-chip');
-  if (dateChip && state.days.length) dateChip.textContent = `${displayDate(state.days[0])} – ${displayDate(state.days[state.days.length-1])} ▾`;
+  setupDateControls();
+  updateDateControls();
+}
+
+function setupDateControls(){
+  if (!state.days.length) return;
+  const min = state.days[0];
+  const max = state.days[state.days.length-1];
+  ['singleDate','fromDate','toDate'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.min = min; el.max = max; }
+  });
+  const single = document.getElementById('singleDate');
+  const from = document.getElementById('fromDate');
+  const to = document.getElementById('toDate');
+  if (single && !single.value) single.value = max;
+  if (from && !from.value) from.value = min;
+  if (to && !to.value) to.value = max;
+}
+
+function selectedDateRange(){
+  const mode = document.getElementById('dateFilter')?.value || 'AUTO';
+  const min = state.days[0] || '';
+  const max = state.days[state.days.length-1] || '';
+
+  if (mode === 'DAY') {
+    const day = document.getElementById('singleDate')?.value || max;
+    return { mode, from: day, to: day };
+  }
+
+  if (mode === 'RANGE') {
+    let from = document.getElementById('fromDate')?.value || min;
+    let to = document.getElementById('toDate')?.value || max;
+    if (from && to && from > to) [from, to] = [to, from];
+    return { mode, from, to };
+  }
+
+  return { mode:'AUTO', from:min, to:max };
+}
+
+function updateDateControls(){
+  const mode = document.getElementById('dateFilter')?.value || 'AUTO';
+  document.getElementById('singleDayControl')?.classList.toggle('active', mode === 'DAY');
+  document.getElementById('rangeControl')?.classList.toggle('active', mode === 'RANGE');
+
+  const { from, to } = selectedDateRange();
+  const chip = document.getElementById('dateChip') || document.querySelector('.date-chip');
+  if (chip) {
+    if (!from && !to) chip.textContent = 'No date data ▾';
+    else if (from === to) chip.textContent = `${displayDate(from)} ▾`;
+    else chip.textContent = `${displayDate(from)} – ${displayDate(to)} ▾`;
+  }
+}
+
+function inSelectedDateRange(row){
+  const { from, to } = selectedDateRange();
+  if (!row.date) return true;
+  if (from && row.date < from) return false;
+  if (to && row.date > to) return false;
+  return true;
+}
+
+function visibleDays(){
+  const { from, to } = selectedDateRange();
+  return state.days.filter(d => (!from || d >= from) && (!to || d <= to));
 }
 
 function filtered(){
   const c = document.getElementById('clubFilter')?.value || 'ALL';
-  return c === 'ALL' ? state.rawData : state.rawData.filter(d => d.club === c);
+  return state.rawData.filter(d => (c === 'ALL' || d.club === c) && inSelectedDateRange(d));
 }
 
 function filteredRoster(){
   const c = document.getElementById('clubFilter')?.value || 'ALL';
-  return c === 'ALL' ? state.rosterRows : state.rosterRows.filter(d => d.club === c);
+  return state.rosterRows.filter(d => (c === 'ALL' || d.club === c) && inSelectedDateRange(d));
 }
 
 function destroy(id){ if(state.charts[id]) state.charts[id].destroy(); }
@@ -775,7 +853,7 @@ function renderCharts(){
   const products = productRows(data);
   const clubs = clubRows(data);
 
-  const dateRows = state.days.map(d => {
+  const dateRows = visibleDays().map(d => {
     const rows = data.filter(x => x.date === d);
     return {
       date: d,
@@ -916,7 +994,7 @@ function renderCharts(){
   const bc=document.getElementById('bestClubText'); if(bc) bc.textContent = bestClub ? `${bestClub.club} — ${money(bestClub.revenue)}` : '-';
 }
 
-function renderAll(){ renderKPIs(); renderTables(); renderCharts(); }
+function renderAll(){ updateDateControls(); renderKPIs(); renderTables(); renderCharts(); }
 
 function setPage(page){
   state.currentPage = page;
@@ -948,6 +1026,11 @@ document.querySelectorAll('.nav-item').forEach(x=>x.addEventListener('click',()=
 document.getElementById('clubFilter').addEventListener('change',()=>{
   document.querySelectorAll('[data-club-button]').forEach(b=>b.classList.toggle('active', b.dataset.clubButton === document.getElementById('clubFilter').value));
   renderAll();
+});
+
+['dateFilter','singleDate','fromDate','toDate'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', renderAll);
 });
 
 loadCSVData();
