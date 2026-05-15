@@ -24,7 +24,8 @@
     .sidebar-timeframe { margin-top:22px; padding-top:18px; border-top:1px solid #edf2f7; }
     .date-control { display:none; margin-top:10px; }
     .date-control.active { display:block; }
-    .date-control-grid { display:grid; grid-template-columns:1fr; gap:10px; margin-top:10px; }
+    .date-control-grid { display:none; grid-template-columns:1fr; gap:10px; margin-top:10px; }
+    .date-control-grid.active { display:grid; }
     .date-input { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:14px; padding:11px 12px; outline:none; color:#0f172a; font-weight:650; font-size:13px; }
     .date-hint { font-size:11px; line-height:1.35; color:#94a3b8; margin-top:8px; font-weight:650; }
     .main { flex:1; padding:24px; min-width:0; }
@@ -99,7 +100,7 @@
       <div class="sidebar-timeframe">
         <div class="side-label">Time Frame</div>
         <select id="dateFilter" class="select">
-          <option value="AUTO">Auto Date Range</option>
+          <option value="AUTO">All Period</option>
           <option value="DAY">Single Day</option>
           <option value="RANGE">From - To</option>
         </select>
@@ -110,7 +111,7 @@
           <input id="fromDate" type="date" class="date-input" />
           <input id="toDate" type="date" class="date-input" />
         </div>
-        <div class="date-hint">Auto = full available data. Single Day = one exact day. From - To = custom range.</div>
+        <div class="date-hint">All Period = full available data. Single Day = one exact day. From - To = custom range.</div>
       </div>
     </div>
 
@@ -131,7 +132,7 @@
           <button data-club-button="VVO">VVO</button>
           <button class="active" data-club-button="ALL">All Clubs</button>
         </div>
-        <div id="dateChip" class="date-chip">Auto Date Range ▾</div>
+        <div id="dateChip" class="date-chip">All Period ▾</div>
       </div>
     </header>
 
@@ -689,7 +690,8 @@ function updateDateControls(){
   const { from, to } = selectedDateRange();
   const chip = document.getElementById('dateChip') || document.querySelector('.date-chip');
   if (chip) {
-    if (!from && !to) chip.textContent = 'No date data ▾';
+    if (mode === 'AUTO') chip.textContent = 'All Period ▾';
+    else if (!from && !to) chip.textContent = 'No date data ▾';
     else if (from === to) chip.textContent = `${displayDate(from)} ▾`;
     else chip.textContent = `${displayDate(from)} – ${displayDate(to)} ▾`;
   }
