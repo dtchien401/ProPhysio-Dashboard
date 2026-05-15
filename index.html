@@ -279,6 +279,16 @@ function normalizeClub(v){
   return s || 'UNKNOWN';
 }
 
+
+function normalizeTherapist(v){
+  // The raw CSV sometimes contains a placeholder/wrong therapist name: "Tú".
+  // There is no therapist named Tú, so exclude exact "Tu/Tú" variants from charts and tables.
+  const s = clean(v);
+  const key = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (key === 'tu') return '';
+  return s;
+}
+
 function parseDateAny(v){
   const s = clean(v);
   if (!s) return null;
@@ -507,7 +517,7 @@ function buildDataModel(){
       noShow: isNoShow ? 1 : 0,
       hours: attended ? hours : 0,
       clients: clean(r['Member Name']) ? 1 : 0,
-      therapist: clean(r['Therapist'])
+      therapist: normalizeTherapist(r['Therapist'])
     };
   }).filter(r => r.date);
 
@@ -516,7 +526,7 @@ function buildDataModel(){
   state.rosterRows = state.roster.map(r => ({
     date: toISODate(r['Date']),
     club: normalizeClub(r['Location']),
-    therapist: clean(r['Therapist']),
+    therapist: normalizeTherapist(r['Therapist']),
     active: lower(r['Active']) === 'yes',
     availableHours: lower(r['Active']) === 'yes' ? shiftHours(r) : 0,
     note: clean(r['Note'])
