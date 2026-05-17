@@ -139,7 +139,7 @@
     <section class="kpi-grid">
       <div class="card kpi-card"><div class="icon-pill">$</div><div><div class="kpi-label">TOTAL REVENUE</div><div id="kpiRevenue" class="kpi-value">$0</div><div class="kpi-change">↑ 18.6%</div></div></div>
       <div class="card kpi-card"><div class="icon-pill">▢</div><div><div class="kpi-label">PACKAGES SOLD</div><div id="kpiPackages" class="kpi-value">0</div><div class="kpi-change">↑ 16.2%</div></div></div>
-      <div class="card kpi-card"><div class="icon-pill">○</div><div><div class="kpi-label">TRIAL SESSIONS</div><div id="kpiTrial" class="kpi-value">0</div><div class="kpi-change">↑ 22.4%</div></div></div>
+      <div class="card kpi-card"><div class="icon-pill">○</div><div><div class="kpi-label">TRIAL LEADS</div><div id="kpiTrial" class="kpi-value">0</div><div class="kpi-change">↑ 22.4%</div></div></div>
       <div class="card kpi-card"><div class="icon-pill">〽</div><div><div class="kpi-label">BURN SESSIONS</div><div id="kpiBurn" class="kpi-value">0</div><div class="kpi-change">↑ 15.7%</div></div></div>
     </section>
 
@@ -232,16 +232,16 @@
 
     <section id="clients" class="page">
       <div class="grid-12 mb-4">
-        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Active Clients</p><h4 id="clientActive">0</h4><p class="text-sm text-slate-500 mt-2">Clients with package or usage this month</p></div></div>
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Paid Clients</p><h4 id="clientActive">0</h4><p class="text-sm text-slate-500 mt-2">Unique clients with contract/package</p></div></div>
         <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Avg Revenue / Client</p><h4 id="clientAvgRev">$0</h4><p class="text-sm text-slate-500 mt-2">Revenue quality indicator</p></div></div>
         <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Avg Sessions / Client</p><h4 id="clientAvgSS">0</h4><p class="text-sm text-slate-500 mt-2">Usage intensity indicator</p></div></div>
       </div>
-      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">CLIENT SEGMENTATION</h3><span>Sample structure</span></div><div class="table-wrap"><table><thead><tr><th>Segment</th><th>Definition</th><th>Clients</th><th>Risk</th><th>Recommended Action</th></tr></thead><tbody><tr><td>New Trial</td><td>Completed trial, no package yet</td><td>52</td><td>Medium</td><td>Call within 24 hours</td></tr><tr><td>Active Burn</td><td>Burned session in last 7 days</td><td>118</td><td>Low</td><td>Keep booking rhythm</td></tr><tr><td>Low Usage</td><td>No burn in 14 days</td><td>34</td><td>High</td><td>Recovery reminder + booking</td></tr><tr><td>Expiring</td><td>Sessions expire in 30 days</td><td>84</td><td>High</td><td>Usage acceleration + renewal</td></tr></tbody></table></div></div>
+      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">CLIENT SEGMENTATION</h3><span>Live data from contracts + bookings</span></div><div class="table-wrap"><table><thead><tr><th>Segment</th><th>Definition</th><th>Count</th><th>Risk</th><th>Recommended Action</th></tr></thead><tbody id="clientSegmentationTable"><tr><td colspan="5">Loading client data...</td></tr></tbody></table></div></div>
     </section>
 
     <section id="reports" class="page">
       <div class="grid-12 mb-4"><div class="card p-4 col-span-8"><div class="section-title"><h3>REPORT SUMMARY</h3><span>Executive readout</span></div><div class="empty-state"><b>May performance snapshot:</b><br/>Revenue is led by TTC, while VVO shows opportunity to improve trial-to-package conversion. Session burn remains healthy, but unused and expiring sessions require follow-up to protect renewal potential.</div></div><div class="card p-4 col-span-4"><div class="section-title"><h3>EXPORT OPTIONS</h3><span>Manual now</span></div><div class="space-y-3"><button class="w-full rounded-xl bg-[#008AF5] text-white font-bold py-3">Export PDF</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Download CSV</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Send Summary</button></div></div></div>
-      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">FULL DAILY REPORT</h3><span>All data</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Product</th><th>Revenue</th><th>Packages</th><th>Trial</th><th>Burn</th><th>Clients</th></tr></thead><tbody id="reportTable"></tbody></table></div></div>
+      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">FULL DAILY REPORT</h3><span>All data</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Product</th><th>Revenue</th><th>Packages</th><th>Trial</th><th>Burn</th><th>Client</th></tr></thead><tbody id="reportTable"></tbody></table></div></div>
     </section>
 
     <section id="settings" class="page">
@@ -767,24 +767,49 @@ function clubRows(data){
   })).sort((a,b)=>b.revenue-a.revenue);
 }
 
+function clientKey(name){
+  return clean(name).toLowerCase().replace(/\s+/g,' ');
+}
+
+function selectedPaidClientKeys(data){
+  return new Set(data.filter(x => x.source === 'contract' && x.client).map(x => clientKey(x.client)));
+}
+
+function selectedTrialLeadKeys(data, paidClientKeys){
+  return new Set(data
+    .filter(x => x.source === 'booking' && x.trial > 0 && x.client && !paidClientKeys.has(clientKey(x.client)))
+    .map(x => clientKey(x.client))
+  );
+}
+
+function daysBetweenISO(a,b){
+  const da = parseDateAny(a);
+  const db = parseDateAny(b);
+  if (!da || !db) return 999999;
+  return Math.floor((db - da) / 86400000);
+}
+
 function renderKPIs(){
   const data = filtered();
   const roster = filteredRoster();
   const revenue = sum(data,'revenue');
   const packages = sum(data,'packages');
-  const trial = sum(data,'trial');
   const burn = sum(data,'burn');
   const contractQty = sum(data,'contractQty');
   const unusedSessions = Math.max(contractQty - burn, 0);
   const avgSSContract = packages ? contractQty / packages : 0;
-  const clients = unique(data.map(x=>x.client)).length;
-  const availableHours = sum(roster,'availableHours');
-  const deliveredHours = sum(data,'hours');
-  const avgRevClient = clients ? revenue / clients : 0;
+
+  // CLIENTS = unique paying clients from contracts only.
+  // TRIAL LEADS = unique trial people from bookings who have not converted into paid clients in the selected view.
+  const paidClientKeys = selectedPaidClientKeys(data);
+  const trialLeadKeys = selectedTrialLeadKeys(data, paidClientKeys);
+  const paidClients = paidClientKeys.size;
+  const trialLeads = trialLeadKeys.size;
+  const avgRevClient = paidClients ? revenue / paidClients : 0;
 
   document.getElementById('kpiRevenue').textContent = money(revenue);
   document.getElementById('kpiPackages').textContent = fmt(packages);
-  document.getElementById('kpiTrial').textContent = fmt(trial);
+  document.getElementById('kpiTrial').textContent = fmt(trialLeads);
   document.getElementById('kpiBurn').textContent = fmt(burn);
 
   const ssSoldEl = document.getElementById('sessionSoldTotal'); if (ssSoldEl) ssSoldEl.textContent = fmt(contractQty);
@@ -793,17 +818,62 @@ function renderKPIs(){
   const unusedEl = document.getElementById('unusedSessions'); if (unusedEl) unusedEl.textContent = fmt(unusedSessions);
 
   ['sumBurn1'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(burn); });
-  ['sumAvgSS1','clientAvgSS'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=(burn/Math.max(clients,1)).toFixed(2); });
+  ['sumAvgSS1','clientAvgSS'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=(burn/Math.max(paidClients,1)).toFixed(2); });
 
-  const ca=document.getElementById('clientActive'); if(ca) ca.textContent=fmt(clients);
+  const ca=document.getElementById('clientActive'); if(ca) ca.textContent=fmt(paidClients);
   const cr=document.getElementById('clientAvgRev'); if(cr) cr.textContent=money(avgRevClient);
   const br=document.getElementById('opsBurnRatio'); if(br) br.textContent=(burn/Math.max(contractQty,1)*100).toFixed(1)+'%';
+
+  renderClientSegmentation(data, paidClientKeys, trialLeadKeys);
 
   // Replace static summary labels if present
   const miniMetrics = document.querySelectorAll('.mini-metric h4');
   miniMetrics.forEach(h => {
     if (h.id === 'opsBurnRatio') return;
   });
+}
+
+function renderClientSegmentation(data, paidClientKeys, trialLeadKeys){
+  const el = document.getElementById('clientSegmentationTable');
+  if (!el) return;
+
+  const bookingData = data.filter(x => x.source === 'booking' && x.client);
+  const contractData = data.filter(x => x.source === 'contract' && x.client);
+  const selectedDays = visibleDays();
+  const endDate = selectedDays[selectedDays.length - 1] || state.days[state.days.length - 1] || '';
+
+  const paidClientLastBurn = {};
+  bookingData.filter(x => x.burn > 0).forEach(x => {
+    const key = clientKey(x.client);
+    if (!paidClientKeys.has(key)) return;
+    if (!paidClientLastBurn[key] || x.date > paidClientLastBurn[key]) paidClientLastBurn[key] = x.date;
+  });
+
+  const activeBurnKeys = new Set(Object.entries(paidClientLastBurn)
+    .filter(([_, lastDate]) => daysBetweenISO(lastDate, endDate) <= 7)
+    .map(([key]) => key)
+  );
+
+  const lowUsageKeys = new Set([...paidClientKeys].filter(key => {
+    const lastDate = paidClientLastBurn[key];
+    if (!lastDate) return true;
+    return daysBetweenISO(lastDate, endDate) > 14;
+  }));
+
+  const newBuyerKeys = new Set(contractData
+    .filter(x => x.date && daysBetweenISO(x.date, endDate) <= 30)
+    .map(x => clientKey(x.client))
+  );
+
+  const rows = [
+    ['Trial Leads', 'Trial completed/booked, no paid contract yet', trialLeadKeys.size, trialLeadKeys.size ? 'Medium' : 'Low', 'Call within 24 hours and convert to package'],
+    ['Paid Clients', 'Unique clients with at least one contract/package', paidClientKeys.size, 'Core Base', 'Protect usage rhythm and renewal'],
+    ['New Buyers', 'Paid clients with contract sold in last 30 days', newBuyerKeys.size, 'Low', 'Onboard into first burn quickly'],
+    ['Active Burn', 'Paid clients with burn session in last 7 days', activeBurnKeys.size, 'Low', 'Keep booking rhythm'],
+    ['Low Usage', 'Paid clients with no burn in last 14 days', lowUsageKeys.size, lowUsageKeys.size ? 'High' : 'Low', 'Recovery reminder + booking follow-up']
+  ];
+
+  el.innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${fmt(r[2])}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('');
 }
 
 function renderTables(){
