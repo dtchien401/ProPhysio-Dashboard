@@ -225,10 +225,10 @@
 
     <section id="therapists" class="page">
       <div class="grid-12 mb-4">
-        <div class="card p-4 col-span-6"><div class="section-title"><h3>THERAPIST PRODUCTIVITY</h3><span>Sample staffing view</span></div><div class="chart-lg"><canvas id="therapistChart"></canvas></div></div>
+        <div class="card p-4 col-span-6"><div class="section-title"><h3>THERAPIST PRODUCTIVITY</h3><span>Actual booking data</span></div><div class="chart-lg"><canvas id="therapistChart"></canvas></div></div>
         <div class="card p-4 col-span-6"><div class="section-title"><h3>THERAPIST NOTES</h3><span>Future data connection</span></div><div class="grid grid-cols-2 gap-3"><div class="empty-state"><b>Need data field:</b><br/>Therapist name per session.</div><div class="empty-state"><b>Measure:</b><br/>Sessions delivered, trial conversion, utilization.</div><div class="empty-state"><b>Use:</b><br/>Plan roster, bonus, coaching and service quality.</div><div class="empty-state"><b>Next step:</b><br/>Add therapist column into raw data.</div></div></div>
       </div>
-      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">THERAPIST TABLE</h3><span>Sample</span></div><div class="table-wrap"><table><thead><tr><th>Therapist</th><th>Club</th><th>Paid Sessions</th><th>Trial Free</th><th>Trial Paid</th><th>Packages Sold</th><th>Utilization</th></tr></thead><tbody id="therapistTable"></tbody></table></div></div>
+      <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">THERAPIST TABLE</h3><span>Actual booking data</span></div><div class="table-wrap"><table><thead><tr><th>Therapist</th><th>Club</th><th>Paid Sessions</th><th>Trial Free</th><th>Trial Paid</th><th>Packages Sold</th><th>Utilization</th></tr></thead><tbody id="therapistTable"></tbody></table></div></div>
     </section>
 
     <section id="clients" class="page">
@@ -331,11 +331,17 @@ function normalizeClub(v){
 
 
 function normalizeTherapist(v){
-  // The raw CSV sometimes contains a placeholder/wrong therapist name: "Tú".
-  // There is no therapist named Tú, so exclude exact "Tu/Tú" variants from charts and tables.
   const s = clean(v);
+  if (!s) return '';
+
+  // Remove encoding-broken names from roster/CSV, e.g. ?an, Ph??ng, Th?ch, Duy?n, C?m T?
+  // These are not real therapist names and should not appear in charts/tables.
+  if (s.includes('?') || s.includes('�')) return '';
+
+  // Exclude exact Tu/Tú placeholder variants.
   const key = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   if (key === 'tu') return '';
+
   return s;
 }
 
@@ -625,11 +631,13 @@ function buildDerivedSeries(){
 }
 
 function buildTherapistRows(){
-  const bookingRows = state.rawData.filter(x => x.source === 'booking');
-  const byTherapist = group(bookingRows.filter(x=>x.therapist), 'therapist');
+  const bookingRows = state.rawData.filter(x => x.source === 'booking' && x.therapist);
+  const byTherapist = group(bookingRows, 'therapist');
   const rosterByTherapist = group(state.rosterRows.filter(x=>x.therapist), 'therapist');
 
-  state.therapists = unique([...Object.keys(byTherapist), ...Object.keys(rosterByTherapist)]).map(name => {
+  // Only show therapists who have real booking activity.
+  // This removes roster-only placeholder/broken-encoding rows with 0 sessions.
+  state.therapists = Object.keys(byTherapist).map(name => {
     const b = byTherapist[name] || [];
     const r = rosterByTherapist[name] || [];
     const club = (b[0] && b[0].club) || (r[0] && r[0].club) || '-';
@@ -652,7 +660,8 @@ function buildTherapistRows(){
       availableHours,
       utilization: availableHours ? deliveredHours / availableHours * 100 : 0
     };
-  }).sort((a,b)=>b.burn-a.burn);
+  }).filter(t => (t.burn + t.trialFree + t.trialPaid + t.packages) > 0)
+    .sort((a,b)=>b.burn-a.burn);
 }
 
 function populateClubOptions(){
