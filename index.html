@@ -544,59 +544,89 @@ function buildDataModel(){
   })).filter(r => r.date || r.revenue || r.packages);
 
   const bookingRows = state.booking.map(r => {
-    const status = lower(r['Status.1'] || r['Status']);
-    const serviceText = lower(r['Service']);
-    const noteText = lower(r['Note']);
-    const combinedText = `${serviceText} ${noteText}`;
+    const bookingId = clean(getField(r, ['Booking ID', 'Booking Id', 'ID']));
+    const statusText = lower(getField(r, ['Status', 'Status.1', 'Booking Status']));
+    const serviceRaw = clean(getField(r, ['Service', 'Service Type', 'Product']));
+    const noteRaw = clean(getField(r, ['Note', 'Notes', 'Remark', 'Remarks']));
+    const serviceText = lower(serviceRaw);
+    const noteText = lower(noteRaw);
+    const combinedText = `${serviceText} ${noteText} ${statusText}`;
 
-    const isCancelled = status.includes('cancel') || combinedText.includes('cancel');
-    const isNoShow = status.includes('no show') || combinedText.includes('no show');
+    // Use Status as the main attendance filter.
+    // Count Done/Booked/confirmed rows, but exclude Cancelled and No Show.
+    const isCancelled =
+      statusText.includes('cancel') ||
+      statusText.includes('cancelled') ||
+      statusText.includes('canceled');
+
+    const isNoShow =
+      statusText.includes('no show') ||
+      statusText.includes('noshow') ||
+      statusText.includes('no-show');
+
+    const isActiveBooking = !isCancelled && !isNoShow;
 
     // Booking classification:
-    // - Trial Free: trial/try/trải nghiệm without paid keyword
-    // - Trial Paid: trial/try/trải nghiệm with paid / trả phí / có phí keyword
-    // - Paid Session: non-trial attended booking, assumed to be contract/package session
-    const isTrial =
+    // 1) Trial Paid: Service/Note contains Trial + paid marker such as paid/450k/trả phí/có phí.
+    // 2) Trial Free: Trial without paid marker.
+    // 3) Paid Session: Service/Note contains Session/burn/ss and is not Trial.
+    const hasTrialKeyword =
       combinedText.includes('trial') ||
       combinedText.includes('trải nghiệm') ||
       combinedText.includes('trai nghiem') ||
       combinedText.includes('try');
 
-    const isTrialPaid = isTrial && (
+    const hasPaidMarker =
       combinedText.includes('trial paid') ||
       combinedText.includes('paid trial') ||
       combinedText.includes('paid') ||
+      combinedText.includes('450k') ||
+      combinedText.includes('450') ||
       combinedText.includes('trả phí') ||
       combinedText.includes('tra phi') ||
       combinedText.includes('có phí') ||
-      combinedText.includes('co phi')
-    );
+      combinedText.includes('co phi') ||
+      combinedText.includes('fee');
 
-    const isTrialFree = isTrial && !isTrialPaid;
-    const booked = clean(r['Booking ID']) ? 1 : 0;
-    const attended = booked && !isCancelled && !isNoShow;
-    const hours = durationHoursFromRange(r['Time']);
+    const isTrialPaid = hasTrialKeyword && hasPaidMarker;
+    const isTrialFree = hasTrialKeyword && !hasPaidMarker;
+
+    const isPaidSession =
+      !hasTrialKeyword && (
+        serviceText.includes('session') ||
+        noteText.includes('session') ||
+        noteText.includes('burn ss') ||
+        noteText.includes('burn session') ||
+        noteText.includes('pt-') ||
+        noteText.includes('contract')
+      );
+
+    // Count booking even when Booking ID is blank, as long as there is a valid row and status is not cancelled/no-show.
+    const booked = isActiveBooking && (bookingId || serviceRaw || noteRaw || clean(getField(r, ['Member Name'])) || clean(getField(r, ['Phone']))) ? 1 : 0;
+    const attended = booked && isActiveBooking;
+    const hours = durationHoursFromRange(getField(r, ['Time']));
 
     return {
       source: 'booking',
-      bookingId: clean(r['Booking ID']),
-      date: toISODate(r['Date']),
-      club: normalizeClub(r['Location']),
-      client: clean(r['Member Name']),
-      product: clean(r['Service']) || (isTrial ? (isTrialPaid ? 'Trial Paid' : 'Trial Free') : 'Physio Session'),
+      bookingId,
+      date: toISODate(getField(r, ['Date'])),
+      club: normalizeClub(getField(r, ['Location', 'Club', 'Billing Club'])),
+      client: clean(getField(r, ['Member Name', 'Client', 'Customer Name'])),
+      product: serviceRaw || (hasTrialKeyword ? (isTrialPaid ? 'Trial Paid' : 'Trial Free') : 'Physio Session'),
       revenue: 0,
       packages: 0,
       contractQty: 0,
       trialFree: isTrialFree && attended ? 1 : 0,
       trialPaid: isTrialPaid && attended ? 1 : 0,
-      trial: isTrial && attended ? 1 : 0,
-      burn: !isTrial && attended ? 1 : 0,
+      trial: hasTrialKeyword && attended ? 1 : 0,
+      burn: isPaidSession && attended ? 1 : 0,
       booked,
       cancelled: isCancelled ? 1 : 0,
       noShow: isNoShow ? 1 : 0,
+      status: statusText,
       hours: attended ? hours : 0,
-      clients: clean(r['Member Name']) ? 1 : 0,
-      therapist: normalizeTherapist(r['Therapist'])
+      clients: clean(getField(r, ['Member Name', 'Client', 'Customer Name'])) ? 1 : 0,
+      therapist: normalizeTherapist(getField(r, ['Therapist']))
     };
   }).filter(r => r.date);
 
