@@ -545,66 +545,33 @@ function buildDataModel(){
 
   const bookingRows = state.booking.map(r => {
     const bookingId = clean(getField(r, ['Booking ID', 'Booking Id', 'ID']));
-    const statusText = lower(getField(r, ['Status', 'Status.1', 'Booking Status']));
+    const statusRaw = clean(getField(r, ['Status', 'Status.1', 'Booking Status']));
+    const statusText = lower(statusRaw);
     const serviceRaw = clean(getField(r, ['Service', 'Service Type', 'Product']));
+    const serviceText = lower(serviceRaw).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const noteRaw = clean(getField(r, ['Note', 'Notes', 'Remark', 'Remarks']));
-    const serviceText = lower(serviceRaw);
-    const noteText = lower(noteRaw);
-    const combinedText = `${serviceText} ${noteText} ${statusText}`;
 
-    // Use Status as the main attendance filter.
-    // Count Done/Booked/confirmed rows, but exclude Cancelled and No Show.
-    const isCancelled =
-      statusText.includes('cancel') ||
-      statusText.includes('cancelled') ||
-      statusText.includes('canceled');
+    // Booking.csv mapping is driven by Service + Status:
+    // Service = Trial / Trial paid / Session
+    // Status  = Booked / Done / Cancelled
+    const isCancelled = statusText.includes('cancel');
+    const isDone = statusText === 'done' || statusText.includes('done') || statusText.includes('completed') || statusText.includes('complete');
+    const isBookedStatus = statusText === 'booked' || statusText.includes('booked') || statusText.includes('booking');
+    const isValidBooking = !isCancelled && (isDone || isBookedStatus || statusText === '');
 
-    const isNoShow =
-      statusText.includes('no show') ||
-      statusText.includes('noshow') ||
-      statusText.includes('no-show');
+    const isTrialPaid = serviceText === 'trial paid' || serviceText.includes('trial paid') || serviceText.includes('paid trial');
+    const isTrialFree = !isTrialPaid && (serviceText === 'trial' || serviceText.includes('trial'));
+    const isPaidSession = serviceText === 'session' || serviceText.includes('session');
 
-    const isActiveBooking = !isCancelled && !isNoShow;
+    // Count rules:
+    // Trial Free / Trial Paid: count valid rows, including Booked and Done, excluding Cancelled.
+    // Paid Sessions: count Done only, excluding Booked and Cancelled.
+    const trialFreeCount = isTrialFree && isValidBooking ? 1 : 0;
+    const trialPaidCount = isTrialPaid && isValidBooking ? 1 : 0;
+    const paidSessionDoneCount = isPaidSession && isDone && !isCancelled ? 1 : 0;
 
-    // Booking classification:
-    // 1) Trial Paid: Service/Note contains Trial + paid marker such as paid/450k/trả phí/có phí.
-    // 2) Trial Free: Trial without paid marker.
-    // 3) Paid Session: Service/Note contains Session/burn/ss and is not Trial.
-    const hasTrialKeyword =
-      combinedText.includes('trial') ||
-      combinedText.includes('trải nghiệm') ||
-      combinedText.includes('trai nghiem') ||
-      combinedText.includes('try');
-
-    const hasPaidMarker =
-      combinedText.includes('trial paid') ||
-      combinedText.includes('paid trial') ||
-      combinedText.includes('paid') ||
-      combinedText.includes('450k') ||
-      combinedText.includes('450') ||
-      combinedText.includes('trả phí') ||
-      combinedText.includes('tra phi') ||
-      combinedText.includes('có phí') ||
-      combinedText.includes('co phi') ||
-      combinedText.includes('fee');
-
-    const isTrialPaid = hasTrialKeyword && hasPaidMarker;
-    const isTrialFree = hasTrialKeyword && !hasPaidMarker;
-
-    const isPaidSession =
-      !hasTrialKeyword && (
-        serviceText.includes('session') ||
-        noteText.includes('session') ||
-        noteText.includes('burn ss') ||
-        noteText.includes('burn session') ||
-        noteText.includes('pt-') ||
-        noteText.includes('contract')
-      );
-
-    // Count booking even when Booking ID is blank, as long as there is a valid row and status is not cancelled/no-show.
-    const booked = isActiveBooking && (bookingId || serviceRaw || noteRaw || clean(getField(r, ['Member Name'])) || clean(getField(r, ['Phone']))) ? 1 : 0;
-    const attended = booked && isActiveBooking;
-    const hours = durationHoursFromRange(getField(r, ['Time']));
+    const booked = isValidBooking && (bookingId || serviceRaw || noteRaw || clean(getField(r, ['Member Name'])) || clean(getField(r, ['Phone']))) ? 1 : 0;
+    const hours = paidSessionDoneCount ? durationHoursFromRange(getField(r, ['Time'])) : 0;
 
     return {
       source: 'booking',
@@ -612,19 +579,20 @@ function buildDataModel(){
       date: toISODate(getField(r, ['Date'])),
       club: normalizeClub(getField(r, ['Location', 'Club', 'Billing Club'])),
       client: clean(getField(r, ['Member Name', 'Client', 'Customer Name'])),
-      product: serviceRaw || (hasTrialKeyword ? (isTrialPaid ? 'Trial Paid' : 'Trial Free') : 'Physio Session'),
+      product: serviceRaw || (isTrialPaid ? 'Trial Paid' : isTrialFree ? 'Trial' : isPaidSession ? 'Session' : 'Unknown Booking'),
       revenue: 0,
       packages: 0,
       contractQty: 0,
-      trialFree: isTrialFree && attended ? 1 : 0,
-      trialPaid: isTrialPaid && attended ? 1 : 0,
-      trial: hasTrialKeyword && attended ? 1 : 0,
-      burn: isPaidSession && attended ? 1 : 0,
+      trialFree: trialFreeCount,
+      trialPaid: trialPaidCount,
+      trial: trialFreeCount + trialPaidCount,
+      burn: paidSessionDoneCount,
       booked,
       cancelled: isCancelled ? 1 : 0,
-      noShow: isNoShow ? 1 : 0,
+      noShow: 0,
       status: statusText,
-      hours: attended ? hours : 0,
+      serviceType: isTrialPaid ? 'trialPaid' : isTrialFree ? 'trialFree' : isPaidSession ? 'session' : 'other',
+      hours,
       clients: clean(getField(r, ['Member Name', 'Client', 'Customer Name'])) ? 1 : 0,
       therapist: normalizeTherapist(getField(r, ['Therapist']))
     };
@@ -969,7 +937,7 @@ function renderTables(){
   ).join('');
 
   const ops = bookingData.sort((a,b)=>b.date.localeCompare(a.date)).map(d =>
-    `<tr><td>${displayDate(d.date)}</td><td>${d.club}</td><td>${d.burn}</td><td>${d.trialFree}</td><td>${d.trialPaid}</td><td>0</td><td>${d.cancelled ? 'Cancelled' : d.burn || d.trial ? 'Booked' : 'Check'}</td></tr>`
+    `<tr><td>${displayDate(d.date)}</td><td>${d.club}</td><td>${d.burn}</td><td>${d.trialFree}</td><td>${d.trialPaid}</td><td>0</td><td>${d.cancelled ? 'Cancelled' : d.burn ? 'Done' : d.trial ? 'Booked/Done' : 'Check'}</td></tr>`
   ).join('');
 
   const detail = data.sort((a,b)=>b.date.localeCompare(a.date)).map(d =>
