@@ -15,22 +15,22 @@
     .app { min-height:100vh; display:flex; background:#f6f9fd; }
     .sidebar { width:260px; flex:0 0 260px; min-height:100vh; background:#fff; border-right:1px solid #e6edf6; padding:22px 18px; display:flex; flex-direction:column; justify-content:space-between; }
     .logo { width:190px; height:auto; object-fit:contain; margin:10px 8px 34px; }
-    .nav-item { display:flex; align-items:center; gap:13px; padding:14px 16px; border-radius:16px; color:#334155; font-size:15px; font-weight:750; cursor:pointer; user-select:none; transition:.18s ease; }
+    .nav-item { display:flex; align-items:center; gap:13px; padding:14px 16px; border-radius:16px; color:#334155; font-size:15px; font-weight:700; cursor:pointer; user-select:none; transition:.18s ease; }
     .nav-item:hover { background:#eef7ff; color:#008AF5; }
     .nav-item.active { background:#008AF5; color:#fff; box-shadow:0 14px 30px rgba(0,138,245,.22); }
     .nav-icon { width:22px; text-align:center; opacity:.9; }
-    .side-label { font-size:12px; font-weight:850; letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px; color:#0f172a; }
-    .select { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:16px; padding:13px 14px; outline:none; color:#0f172a; font-weight:650; }
+    .side-label { font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px; color:#0f172a; }
+    .select { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:16px; padding:13px 14px; outline:none; color:#0f172a; font-weight:600; }
     .sidebar-timeframe { margin-top:22px; padding-top:18px; border-top:1px solid #edf2f7; }
     .date-control { display:none; margin-top:10px; }
     .date-control.active { display:block; }
     .date-control-grid { display:none; grid-template-columns:1fr; gap:10px; margin-top:10px; }
     .date-control-grid.active { display:grid; }
-    .date-input { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:14px; padding:11px 12px; outline:none; color:#0f172a; font-weight:650; font-size:13px; }
-    .date-hint { font-size:11px; line-height:1.35; color:#94a3b8; margin-top:8px; font-weight:650; }
+    .date-input { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:14px; padding:11px 12px; outline:none; color:#0f172a; font-weight:600; font-size:13px; }
+    .date-hint { font-size:11px; line-height:1.35; color:#94a3b8; margin-top:8px; font-weight:600; }
     .main { flex:1; padding:24px; min-width:0; }
     .topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:18px; }
-    .page-title { font-size:30px; line-height:1.1; font-weight:850; letter-spacing:-.04em; }
+    .page-title { font-size:30px; line-height:1.1; font-weight:800; letter-spacing:-.04em; }
     .page-subtitle { color:#64748b; margin-top:6px; font-size:14px; }
     .segmented { background:#fff; border:1px solid #dce8f4; border-radius:15px; padding:4px; display:flex; box-shadow:0 10px 25px rgba(15,23,42,.04); }
     .segmented button { padding:10px 28px; border-radius:11px; font-weight:800; font-size:14px; color:#334155; }
@@ -42,13 +42,13 @@
     .kpi-card:first-child { padding-right:22px; }
     .kpi-card { padding:16px; display:flex; align-items:center; gap:12px; min-height:108px; }
     .icon-pill { width:42px; height:42px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:#eaf5ff; color:#008AF5; font-weight:900; flex:0 0 42px; }
-    .kpi-label { font-size:11px; color:#64748b; font-weight:850; letter-spacing:.02em; }
-    .kpi-value { font-size:24px; font-weight:850; margin-top:5px; letter-spacing:-.03em; }
-    .kpi-change { font-size:12px; color:#059669; margin-top:8px; font-weight:750; }
+    .kpi-label { font-size:11px; color:#64748b; font-weight:800; letter-spacing:.02em; }
+    .kpi-value { font-size:24px; font-weight:800; margin-top:5px; letter-spacing:-.03em; }
+    .kpi-change { font-size:12px; color:#059669; margin-top:8px; font-weight:700; }
     .grid-12 { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:14px; }
     .section-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
-    .section-title h3 { font-size:14px; font-weight:850; letter-spacing:-.01em; }
-    .section-title span { font-size:12px; color:#94a3b8; font-weight:650; }
+    .section-title h3 { font-size:14px; font-weight:800; letter-spacing:-.01em; }
+    .section-title span { font-size:12px; color:#94a3b8; font-weight:600; }
     .chart-lg { height:245px; }
     .chart-md { height:220px; }
     .chart-sm { height:190px; }
@@ -57,7 +57,7 @@
     .page.active { display:block; }
     .table-wrap { overflow:auto; border:1px solid #e5edf7; border-radius:14px; }
     table { width:100%; border-collapse:collapse; font-size:12px; }
-    th { background:#f8fbff; color:#475569; font-weight:850; text-align:center; padding:10px; border-bottom:1px solid #e5edf7; white-space:nowrap; }
+    th { background:#f8fbff; color:#475569; font-weight:800; text-align:center; padding:10px; border-bottom:1px solid #e5edf7; white-space:nowrap; }
     td { padding:10px; border-bottom:1px solid #eef3f8; text-align:center; color:#0f172a; white-space:nowrap; }
     td:first-child, th:first-child { text-align:left; }
     tr:hover td { background:#f3f9ff; }
@@ -66,14 +66,38 @@
     .summary-item:nth-child(odd) { border-right:1px solid #edf2f7; }
     .summary-item:nth-child(n+3) { border-bottom:none; }
     .mini-metric { padding:18px; }
-    .mini-metric h4 { font-size:24px; font-weight:850; margin-top:4px; }
-    .badge { display:inline-flex; align-items:center; border-radius:999px; padding:7px 11px; background:#eaf5ff; color:#0078dd; font-size:12px; font-weight:850; }
+    .mini-metric h4 { font-size:24px; font-weight:800; margin-top:4px; }
+    .badge { display:inline-flex; align-items:center; border-radius:999px; padding:7px 11px; background:#eaf5ff; color:#0078dd; font-size:12px; font-weight:800; }
     .empty-state { padding:28px; border:1px dashed #cfe0f1; border-radius:18px; background:#fbfdff; color:#64748b; }
+    @media print {
+      .sidebar, #sidebarToggle, #loadingOverlay { display: none !important; }
+      .main { padding: 0; }
+      .card { box-shadow: none; border: 1px solid #ccc; }
+      .page { display: block !important; }
+    }
     @media (max-width:1300px){ .kpi-grid{grid-template-columns:repeat(3,1fr);} .grid-12{grid-template-columns:repeat(6,1fr);} .col-span-5,.col-span-4,.col-span-3,.col-span-6,.col-span-8{grid-column:span 6/span 6!important;} }
-    @media (max-width:900px){ .app{display:block;} .sidebar{width:100%; min-height:auto;} .main{padding:18px;} .topbar{flex-direction:column;} .kpi-grid{grid-template-columns:repeat(2,1fr);} }
+    @media (max-width:900px){
+      .app{display:block;}
+      .sidebar{width:100%;min-height:auto;display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;overflow-y:auto;}
+      .sidebar.sidebar-open{display:flex;}
+      #sidebarToggle{display:block!important;}
+      .main{padding:18px;}
+      .topbar{flex-direction:column;}
+      .kpi-grid{grid-template-columns:repeat(2,1fr);}
+    }
+    @media (max-width:540px){
+      .kpi-grid{grid-template-columns:1fr;}
+      td, th { white-space: normal; min-width: 80px; }
+    }
   </style>
 </head>
 <body>
+<div id="loadingOverlay" style="position:fixed;inset:0;background:rgba(246,249,253,0.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+  <div style="width:44px;height:44px;border:4px solid #dce8f4;border-top-color:#008AF5;border-radius:50%;animation:spin .7s linear infinite;"></div>
+  <div style="font-size:14px;font-weight:700;color:#334155;">Loading dashboard data…</div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
+
 <div class="app">
   <aside class="sidebar">
     <div>
@@ -122,9 +146,12 @@
 
   <main class="main">
     <header class="topbar">
-      <div>
-        <h1 id="pageTitle" class="page-title">OVERVIEW</h1>
-        <p id="pageSubtitle" class="page-subtitle">Physio Therapy Performance Dashboard</p>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button id="sidebarToggle" onclick="document.querySelector('.sidebar').classList.toggle('sidebar-open')" style="display:none;background:none;border:1px solid #dce8f4;border-radius:10px;padding:8px 11px;cursor:pointer;font-size:18px;line-height:1;color:#334155;">☰</button>
+        <div>
+          <h1 id="pageTitle" class="page-title">OVERVIEW</h1>
+          <p id="pageSubtitle" class="page-subtitle">Physio Therapy Performance Dashboard</p>
+        </div>
       </div>
       <div class="flex items-center gap-4 flex-wrap">
         <div class="segmented">
@@ -137,11 +164,11 @@
     </header>
 
     <section class="kpi-grid">
-      <div class="card kpi-card"><div class="icon-pill">$</div><div><div class="kpi-label">TOTAL REVENUE</div><div id="kpiRevenue" class="kpi-value">$0</div><div class="kpi-change">↑ 18.6%</div></div></div>
-      <div class="card kpi-card"><div class="icon-pill">▢</div><div><div class="kpi-label">PACKAGES SOLD</div><div id="kpiPackages" class="kpi-value">0</div><div class="kpi-change">↑ 16.2%</div></div></div>
+      <div class="card kpi-card"><div class="icon-pill">$</div><div><div class="kpi-label">TOTAL REVENUE</div><div id="kpiRevenue" class="kpi-value">$0</div><div id="kpiRevenueChange" class="kpi-change">—</div></div></div>
+      <div class="card kpi-card"><div class="icon-pill">▢</div><div><div class="kpi-label">PACKAGES SOLD</div><div id="kpiPackages" class="kpi-value">0</div><div id="kpiPackagesChange" class="kpi-change">—</div></div></div>
       <div class="card kpi-card"><div class="icon-pill">○</div><div><div class="kpi-label">TRIAL FREE</div><div id="kpiTrialFree" class="kpi-value">0</div><div class="kpi-change">Free trial sessions</div></div></div>
       <div class="card kpi-card"><div class="icon-pill">₫</div><div><div class="kpi-label">TRIAL PAID</div><div id="kpiTrialPaid" class="kpi-value">0</div><div class="kpi-change">Paid trial sessions</div></div></div>
-      <div class="card kpi-card"><div class="icon-pill">〽</div><div><div class="kpi-label">PAID SESSIONS</div><div id="kpiBurn" class="kpi-value">0</div><div class="kpi-change">Contract/package sessions</div></div></div>
+      <div class="card kpi-card"><div class="icon-pill">〽</div><div><div class="kpi-label">PAID SESSIONS</div><div id="kpiBurn" class="kpi-value">0</div><div id="kpiBurnChange" class="kpi-change">Contract/package sessions</div></div></div>
     </section>
 
     <section id="overview" class="page active">
@@ -260,7 +287,7 @@
     </section>
 
     <section id="reports" class="page">
-      <div class="grid-12 mb-4"><div class="card p-4 col-span-8"><div class="section-title"><h3>REPORT SUMMARY</h3><span>Executive readout</span></div><div class="empty-state"><b>May performance snapshot:</b><br/>Revenue is led by TTC, while VVO shows opportunity to improve trial-to-package conversion. Paid-session usage remains healthy, but unused and expiring sessions require follow-up to protect renewal potential.</div></div><div class="card p-4 col-span-4"><div class="section-title"><h3>EXPORT OPTIONS</h3><span>Manual now</span></div><div class="space-y-3"><button class="w-full rounded-xl bg-[#008AF5] text-white font-bold py-3">Export PDF</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Download CSV</button><button class="w-full rounded-xl border border-slate-200 font-bold py-3">Send Summary</button></div></div></div>
+      <div class="grid-12 mb-4"><div class="card p-4 col-span-8"><div class="section-title"><h3>REPORT SUMMARY</h3><span>Executive readout</span></div><div class="empty-state"><b>May performance snapshot:</b><br/>Revenue is led by TTC, while VVO shows opportunity to improve trial-to-package conversion. Paid-session usage remains healthy, but unused and expiring sessions require follow-up to protect renewal potential.</div></div><div class="card p-4 col-span-4"><div class="section-title"><h3>EXPORT OPTIONS</h3><span>Download data</span></div><div class="space-y-3"><button onclick="exportPDF()" class="w-full rounded-xl bg-[#008AF5] text-white font-bold py-3">Export PDF</button><button onclick="exportCSV()" class="w-full rounded-xl border border-slate-200 font-bold py-3">Download CSV</button></div></div></div>
       <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">FULL DAILY REPORT</h3><span>All data</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Product</th><th>Revenue</th><th>Packages</th><th>Trial Free</th><th>Trial Paid</th><th>Paid Session</th><th>Client</th></tr></thead><tbody id="reportTable"></tbody></table></div></div>
     </section>
 
@@ -531,12 +558,14 @@ async function loadCSVData(){
     const sourceLine = `Loaded ${state.booking.length} bookings, ${state.contracts.length} contracts, ${state.roster.length} roster rows.`;
     setLoadStatus(sourceLine);
     renderAll();
+    const ov = document.getElementById('loadingOverlay'); if (ov) ov.style.display = 'none';
 
   } catch (err) {
     console.error(err);
     setLoadStatus('CSV load failed. Check file names, GitHub Pages path, or raw GitHub links.');
     buildFallbackData();
     renderAll();
+    const ov = document.getElementById('loadingOverlay'); if (ov) ov.style.display = 'none';
   }
 }
 
@@ -911,6 +940,62 @@ function renderKPIs(){
   const kpiTrialPaid = document.getElementById('kpiTrialPaid'); if (kpiTrialPaid) kpiTrialPaid.textContent = fmt(trialPaid);
   document.getElementById('kpiBurn').textContent = fmt(burn);
 
+  // Dynamic % change: so sánh kì hiện tại vs cùng kì tháng trước (MoM same-period)
+  (function renderKPIChanges(){
+    function setChange(id, current, previous, hasPrev){
+      const el = document.getElementById(id); if (!el) return;
+      if (!hasPrev) { el.textContent = 'NA'; el.style.color = '#94a3b8'; return; }
+      if (previous === 0) {
+        el.textContent = current > 0 ? '↑ —' : 'NA';
+        el.style.color = '#94a3b8'; return;
+      }
+      const pct = ((current - previous) / previous * 100).toFixed(1);
+      const up = current >= previous;
+      el.textContent = (up ? '↑ ' : '↓ ') + Math.abs(pct) + '%';
+      el.style.color = up ? '#059669' : '#ef4444';
+    }
+
+    const { from, to } = selectedDateRange();
+    const toDate   = parseDateAny(to);
+    const fromDate = parseDateAny(from);
+
+    if (!toDate || !fromDate) {
+      ['kpiRevenueChange','kpiPackagesChange','kpiBurnChange'].forEach(id => {
+        const el = document.getElementById(id); if (el) { el.textContent = 'NA'; el.style.color = '#94a3b8'; }
+      });
+      return;
+    }
+
+    // Xác định tháng trước
+    const curYear  = toDate.getFullYear();
+    const curMonth = toDate.getMonth(); // 0-indexed
+    const prevYear  = curMonth === 0 ? curYear - 1 : curYear;
+    const prevMonth = curMonth === 0 ? 11 : curMonth - 1;
+
+    // Cùng kì = cùng ngày trong tháng (day-of-month) nhưng sang tháng trước
+    const fromDay         = fromDate.getDate();
+    const toDay           = toDate.getDate();
+    const daysInPrevMonth = new Date(prevYear, prevMonth + 1, 0).getDate();
+    const prevFromDay     = Math.min(fromDay, daysInPrevMonth);
+    const prevToDay       = Math.min(toDay,   daysInPrevMonth);
+
+    const pad = n => String(n).padStart(2, '0');
+    const prevFromISO = `${prevYear}-${pad(prevMonth + 1)}-${pad(prevFromDay)}`;
+    const prevToISO   = `${prevYear}-${pad(prevMonth + 1)}-${pad(prevToDay)}`;
+
+    const c = document.getElementById('clubFilter')?.value || 'ALL';
+    const prevData = state.rawData.filter(d =>
+      (c === 'ALL' || d.club === c) &&
+      d.date >= prevFromISO && d.date <= prevToISO
+    );
+
+    const hasPrev = prevData.length > 0;
+
+    setChange('kpiRevenueChange',  sum(data, 'revenue'),  sum(prevData, 'revenue'),  hasPrev);
+    setChange('kpiPackagesChange', sum(data, 'packages'), sum(prevData, 'packages'), hasPrev);
+    setChange('kpiBurnChange',     sum(data, 'burn'),     sum(prevData, 'burn'),     hasPrev);
+  })();
+
   const ssSoldEl = document.getElementById('sessionSoldTotal'); if (ssSoldEl) ssSoldEl.textContent = fmt(contractQty);
   const ssBurnEl = document.getElementById('sessionBurnTotal'); if (ssBurnEl) ssBurnEl.textContent = fmt(burn);
   const avgSSContractEl = document.getElementById('avgSSContract'); if (avgSSContractEl) avgSSContractEl.textContent = avgSSContract.toFixed(1);
@@ -1180,6 +1265,28 @@ function renderCharts(){
   const bc=document.getElementById('bestClubText'); if(bc) bc.textContent = bestClub ? `${bestClub.club} — ${money(bestClub.revenue)}` : '-';
 }
 
+function exportCSV(){
+  const data = filtered().sort((a,b) => a.date.localeCompare(b.date));
+  const headers = ['Date','Club','Product','Revenue','Packages','Trial Free','Trial Paid','Paid Session','Client'];
+  const rows = data.map(d => [
+    displayDate(d.date), d.club, d.product,
+    d.revenue, d.packages, d.trialFree || 0, d.trialPaid || 0, d.burn, d.client || ''
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `ProPhysio_Report_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function exportPDF(){
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.style.display = 'none';
+  window.print();
+  sidebar.style.display = '';
+}
+
 function renderAll(){ updateDateControls(); renderKPIs(); renderTables(); renderCharts(); }
 
 function setPage(page){
@@ -1214,9 +1321,17 @@ document.getElementById('clubFilter').addEventListener('change',()=>{
   renderAll();
 });
 
-['dateFilter','singleDate','fromDate','toDate'].forEach(id => {
+// Debounce helper — avoids re-rendering on every keystroke for date inputs
+function debounce(fn, ms){
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+const debouncedRenderAll = debounce(renderAll, 300);
+
+document.getElementById('dateFilter').addEventListener('change', renderAll);
+['singleDate','fromDate','toDate'].forEach(id => {
   const el = document.getElementById(id);
-  if (el) el.addEventListener('change', renderAll);
+  if (el) el.addEventListener('change', debouncedRenderAll);
 });
 
 loadCSVData();
