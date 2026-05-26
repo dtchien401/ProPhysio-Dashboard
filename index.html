@@ -217,8 +217,27 @@
       </div>
       <div class="grid-12 mb-4">
         <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Burn Ratio</p><h4 id="opsBurnRatio">0%</h4><p class="text-sm text-slate-500 mt-2">Burned sessions / sold session capacity</p></div></div>
-        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Unused Sessions</p><h4>632</h4><p class="text-sm text-slate-500 mt-2">Need proactive booking follow-up</p></div></div>
-        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Expiring Sessions</p><h4>84</h4><p class="text-sm text-slate-500 mt-2">30-day risk pool</p></div></div>
+        <div class="card p-4 col-span-4"><div class="mini-metric"><p class="text-slate-500">Unused Sessions</p><h4 id="opsUnusedSessions">0</h4><p class="text-sm text-slate-500 mt-2">Sessions sold but not yet utilized</p></div></div>
+        <div class="card p-4 col-span-4">
+          <div class="mini-metric">
+            <p class="text-slate-500">Avg Sessions / Day</p>
+            <div class="grid grid-cols-3 gap-2 mt-3">
+              <div>
+                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">Free Trial</p>
+                <h4 id="avgFreeTrialServed" class="text-2xl font-extrabold mt-1">0.0</h4>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">Paid Trial</p>
+                <h4 id="avgPaidTrialServed" class="text-2xl font-extrabold mt-1">0.0</h4>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">Session Burn</p>
+                <h4 id="avgSessionBurnServed" class="text-2xl font-extrabold mt-1">0.0</h4>
+              </div>
+            </div>
+            <p id="avgSessionsDayNote" class="text-sm text-slate-500 mt-2">Avg per operating day by month</p>
+          </div>
+        </div>
       </div>
       <div class="card p-4"><div class="section-title"><h3 class="text-[#008AF5]">OPERATION DETAIL</h3><span>Session burn by date</span></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Club</th><th>Paid Sessions</th><th>Trial Free</th><th>Trial Paid</th><th>Packages Sold</th><th>Status</th></tr></thead><tbody id="operationsTable"></tbody></table></div></div>
     </section>
@@ -852,6 +871,40 @@ function renderKPIs(){
   const trialLeads = trialLeadKeys.size;
   const avgRevClient = paidClients ? revenue / paidClients : 0;
 
+  // Avg Sessions / Day logic for therapist productivity:
+  // - May 2026 counts operating days from May 11 onward because launch date was May 11.
+  // - Later months count from the 1st day of each month.
+  // - The current selected filter range is respected, so partial months divide only by selected operating days.
+  const countOperatingDaysByMonth = () => {
+    const { from, to } = selectedDateRange();
+    if (!from || !to) return { totalDays: 0, months: [] };
+
+    const launchDate = new Date(2026, 4, 11); // 11 May 2026, month index 4 = May
+    const start = parseDateAny(from);
+    const end = parseDateAny(to);
+    if (!start || !end) return { totalDays: 0, months: [] };
+
+    const monthDays = {};
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    while (d <= end) {
+      if (d >= launchDate) {
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        monthDays[key] = (monthDays[key] || 0) + 1;
+      }
+      d.setDate(d.getDate() + 1);
+    }
+
+    const months = Object.entries(monthDays).map(([month, days]) => ({ month, days }));
+    const totalDays = months.reduce((a,b) => a + b.days, 0);
+    return { totalDays, months };
+  };
+
+  const operating = countOperatingDaysByMonth();
+  const operatingDays = Math.max(operating.totalDays, 1);
+  const avgFreeTrialServed = trialFree / operatingDays;
+  const avgPaidTrialServed = trialPaid / operatingDays;
+  const avgSessionBurnServed = burn / operatingDays;
+
   document.getElementById('kpiRevenue').textContent = money(revenue);
   document.getElementById('kpiPackages').textContent = fmt(packages);
   const kpiTrialFree = document.getElementById('kpiTrialFree'); if (kpiTrialFree) kpiTrialFree.textContent = fmt(trialFree);
@@ -862,6 +915,7 @@ function renderKPIs(){
   const ssBurnEl = document.getElementById('sessionBurnTotal'); if (ssBurnEl) ssBurnEl.textContent = fmt(burn);
   const avgSSContractEl = document.getElementById('avgSSContract'); if (avgSSContractEl) avgSSContractEl.textContent = avgSSContract.toFixed(1);
   const unusedEl = document.getElementById('unusedSessions'); if (unusedEl) unusedEl.textContent = fmt(unusedSessions);
+  const opsUnusedEl = document.getElementById('opsUnusedSessions'); if (opsUnusedEl) opsUnusedEl.textContent = fmt(unusedSessions);
 
   ['sumBurn1'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=fmt(burn); });
   ['sumAvgSS1','clientAvgSS'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=(burn/Math.max(paidClients,1)).toFixed(2); });
@@ -869,6 +923,14 @@ function renderKPIs(){
   const ca=document.getElementById('clientActive'); if(ca) ca.textContent=fmt(paidClients);
   const cr=document.getElementById('clientAvgRev'); if(cr) cr.textContent=money(avgRevClient);
   const br=document.getElementById('opsBurnRatio'); if(br) br.textContent=(burn/Math.max(contractQty,1)*100).toFixed(1)+'%';
+  const avgFtEl = document.getElementById('avgFreeTrialServed'); if (avgFtEl) avgFtEl.textContent = avgFreeTrialServed.toFixed(1);
+  const avgPtEl = document.getElementById('avgPaidTrialServed'); if (avgPtEl) avgPtEl.textContent = avgPaidTrialServed.toFixed(1);
+  const avgBurnEl = document.getElementById('avgSessionBurnServed'); if (avgBurnEl) avgBurnEl.textContent = avgSessionBurnServed.toFixed(1);
+  const avgNoteEl = document.getElementById('avgSessionsDayNote');
+  if (avgNoteEl) {
+    const monthNote = operating.months.map(x => `${x.month}: ${x.days} days`).join(' | ');
+    avgNoteEl.textContent = monthNote ? `Avg per operating day (${monthNote})` : 'Avg per operating day';
+  }
 
   renderClientSegmentation(data, paidClientKeys, trialLeadKeys);
 
