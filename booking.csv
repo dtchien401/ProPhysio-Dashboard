@@ -1,5 +1,5 @@
 ﻿"Booking ID","Date","Time","Location","Therapist","Member Name","Phone","Service","Status","Note","Created At","","","","","Timestamp","memberName","Booking Code"
-"","2026-05-14","17:00-18:00","VVO","Duyên","Chiếng Lý Phát","0902611681","Session","Done","Đau cổ vai gáy","","cần burn bù","","","","","",""
+"","2026-05-14","17:00-18:00","VVO","Duyên","Chiếng Lý Phát","0902611681","Trial paid","Done","Đau cổ vai gáy","","cần burn bù","","","","","",""
 "BK-1779158708290","2026-05-20","10:00-11:00","TTC","Đan","Đặng Ngọc Nhung","0903312168","Session","Done","Session","2026-05-19 09:45:08","","","","ss đã done nhưng chưa book lên CRM, cần MS bunr bù","","",""
 "","2026-05-24","08:00-09:00","TTC","Đan","Đặng Ngọc Nhung","0903312168","Session","Done","","","","","","ss cancel","","",""
 "","2026-05-26","10:00-11:00","TTC","Đan","Đặng Ngọc Nhung","0903312168","Session","Done","","2026-05-20 11:49:08","","","","ss trial 450k","","",""
