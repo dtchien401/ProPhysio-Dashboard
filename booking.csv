@@ -1,5 +1,5 @@
 ﻿"Booking ID","Date","Time","Location","Therapist","Member Name","Phone","Service","Status","Note","Created At","","","","","Timestamp","memberName","Booking Code","bookingSource","customerGroup"
-"","2025-05-16","08:00-09:00","VVO","Thạch","Nguyễn Tấn Phát","0865130147","Trial","Done","PT","","","","","","","","","",""
+"","2026-05-16","08:00-09:00","VVO","Thạch","Nguyễn Tấn Phát","0865130147","Trial","Done","PT","","","","","","","","","",""
 "BK-1778482269652","2026-05-11","17:00-18:00","TTC","Phương","Kiều Trinh (MKT)","0984435127","Shooting","Done","STAFF","2026-05-11 13:51:09","","","","ss đã done nhưng chưa book lên CRM, cần MS bunr bù","","","","",""
 "BK-1778474595326","2026-05-11","18:00-19:00","TTC","Phương","Lê Thanh Thuỷ (Mkt)","0909010591","Shooting","Done","STAFF","2026-05-11 11:43:15","","","","ss cancel","","","","",""
 "BK-1778566034242","2026-05-12","15:00-16:00","VVO","Duyên","anh Quân (PT Tiger)","0903832903","Trial","Done","","2026-05-12 13:07:14","","","","ss trial 450k","","","","",""
