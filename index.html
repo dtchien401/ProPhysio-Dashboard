@@ -24,13 +24,10 @@
     .nav-icon { width:22px; text-align:center; opacity:.9; }
     .side-label { font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px; color:#0f172a; }
     .select { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:16px; padding:13px 14px; outline:none; color:#0f172a; font-weight:600; }
-    .sidebar-timeframe { margin-top:22px; padding-top:18px; border-top:1px solid #edf2f7; }
-    .date-control { display:none; margin-top:10px; }
-    .date-control.active { display:block; }
-    .date-control-grid { display:none; grid-template-columns:1fr; gap:10px; margin-top:10px; }
-    .date-control-grid.active { display:grid; }
-    .date-input { width:100%; border:1px solid #dce8f4; background:#fff; border-radius:14px; padding:11px 12px; outline:none; color:#0f172a; font-weight:600; font-size:13px; }
-    .date-hint { font-size:11px; line-height:1.35; color:#94a3b8; margin-top:8px; font-weight:600; }
+    .date-range-inline { display:none; align-items:center; gap:8px; background:#fff; border:1px solid #dce8f4; border-radius:15px; padding:0 14px; height:47px; box-shadow:0 10px 25px rgba(15,23,42,.04); }
+    .date-range-inline.active { display:flex; }
+    .date-input-sm { border:none; outline:none; font-weight:700; font-size:13px; color:#0f172a; background:transparent; width:120px; }
+    .date-range-sep { color:#94a3b8; font-weight:700; }
     .main { flex:1; padding:24px; min-width:0; }
     .topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:18px; }
     .page-title { font-size:30px; line-height:1.1; font-weight:800; letter-spacing:-.04em; }
@@ -106,6 +103,8 @@
       .segmented{width:100%;}
       .segmented button{flex:1;padding:10px 6px;font-size:12.5px;}
       .date-chip{width:100%;text-align:center;}
+      .date-range-inline{width:100%;}
+      .date-input-sm{width:100%;}
       .chart-lg{height:200px;}
       .chart-md{height:180px;}
       .grid-12{gap:12px;}
@@ -152,22 +151,13 @@
         <option value="VVO">VVO</option>
       </select>
 
-      <div class="sidebar-timeframe">
-        <div class="side-label">Time Frame</div>
-        <select id="dateFilter" class="select">
-          <option value="AUTO">All Period</option>
-          <option value="DAY">Single Day</option>
-          <option value="RANGE">From - To</option>
-        </select>
-        <div id="singleDayControl" class="date-control">
-          <input id="singleDate" type="date" class="date-input" />
-        </div>
-        <div id="rangeControl" class="date-control-grid date-control">
-          <input id="fromDate" type="date" class="date-input" />
-          <input id="toDate" type="date" class="date-input" />
-        </div>
-        <div class="date-hint">All Period = full available data. Single Day = one exact day. From - To = custom range.</div>
-      </div>
+      <!-- Time filter is controlled by the segmented buttons in the topbar.
+           Keep this hidden select so existing filter logic continues to work. -->
+      <select id="dateFilter" class="hidden">
+        <option value="MTD">MTD</option>
+        <option value="LASTMONTH">Last Month</option>
+        <option value="RANGE">Custom Range</option>
+      </select>
     </div>
 
     <div class="space-y-5">
@@ -184,13 +174,23 @@
           <p id="pageSubtitle" class="page-subtitle">Physio Therapy Performance Dashboard</p>
         </div>
       </div>
-      <div class="flex items-center gap-4 flex-wrap">
+      <div class="flex items-center gap-3 flex-wrap">
         <div class="segmented">
           <button data-club-button="TTC">TTC</button>
           <button data-club-button="VVO">VVO</button>
           <button class="active" data-club-button="ALL">All Clubs</button>
         </div>
-        <div id="dateChip" class="date-chip">All Period ▾</div>
+        <div class="segmented" id="dateSegmented">
+          <button type="button" data-date-mode="MTD" class="active">MTD</button>
+          <button type="button" data-date-mode="LASTMONTH">Last Month</button>
+          <button type="button" data-date-mode="RANGE">Custom</button>
+        </div>
+        <div id="rangeControl" class="date-range-inline">
+          <input id="fromDate" type="date" class="date-input-sm" />
+          <span class="date-range-sep">–</span>
+          <input id="toDate" type="date" class="date-input-sm" />
+        </div>
+        <div id="dateChip" class="date-chip">—</div>
       </div>
     </header>
 
@@ -770,26 +770,44 @@ function setupDateControls(){
   if (!state.days.length) return;
   const min = state.days[0];
   const max = state.days[state.days.length-1];
-  ['singleDate','fromDate','toDate'].forEach(id => {
+  ['fromDate','toDate'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.min = min; el.max = max; }
   });
-  const single = document.getElementById('singleDate');
   const from = document.getElementById('fromDate');
   const to = document.getElementById('toDate');
-  if (single && !single.value) single.value = max;
   if (from && !from.value) from.value = min;
   if (to && !to.value) to.value = max;
 }
 
+function isoFromParts(y, m, d){
+  return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+
+function mtdRange(maxIso){
+  const d = parseDateAny(maxIso);
+  if (!d) return { from:'', to:'' };
+  return { from: isoFromParts(d.getFullYear(), d.getMonth(), 1), to: maxIso };
+}
+
+function lastMonthRange(maxIso){
+  const d = parseDateAny(maxIso);
+  if (!d) return { from:'', to:'' };
+  const lastDayPrevMonth = new Date(d.getFullYear(), d.getMonth(), 0);
+  return {
+    from: isoFromParts(lastDayPrevMonth.getFullYear(), lastDayPrevMonth.getMonth(), 1),
+    to: isoFromParts(lastDayPrevMonth.getFullYear(), lastDayPrevMonth.getMonth(), lastDayPrevMonth.getDate())
+  };
+}
+
 function selectedDateRange(){
-  const mode = document.getElementById('dateFilter')?.value || 'AUTO';
+  const mode = document.getElementById('dateFilter')?.value || 'MTD';
   const min = state.days[0] || '';
   const max = state.days[state.days.length-1] || '';
 
-  if (mode === 'DAY') {
-    const day = document.getElementById('singleDate')?.value || max;
-    return { mode, from: day, to: day };
+  if (mode === 'LASTMONTH') {
+    const { from, to } = lastMonthRange(max);
+    return { mode, from: from || min, to: to || max };
   }
 
   if (mode === 'RANGE') {
@@ -799,21 +817,21 @@ function selectedDateRange(){
     return { mode, from, to };
   }
 
-  return { mode:'AUTO', from:min, to:max };
+  const { from, to } = mtdRange(max);
+  return { mode:'MTD', from: from || min, to: to || max };
 }
 
 function updateDateControls(){
-  const mode = document.getElementById('dateFilter')?.value || 'AUTO';
-  document.getElementById('singleDayControl')?.classList.toggle('active', mode === 'DAY');
+  const mode = document.getElementById('dateFilter')?.value || 'MTD';
+  document.querySelectorAll('[data-date-mode]').forEach(b=>b.classList.toggle('active', b.dataset.dateMode === mode));
   document.getElementById('rangeControl')?.classList.toggle('active', mode === 'RANGE');
 
   const { from, to } = selectedDateRange();
-  const chip = document.getElementById('dateChip') || document.querySelector('.date-chip');
+  const chip = document.getElementById('dateChip');
   if (chip) {
-    if (mode === 'AUTO') chip.textContent = 'All Period ▾';
-    else if (!from && !to) chip.textContent = 'No date data ▾';
-    else if (from === to) chip.textContent = `${displayDate(from)} ▾`;
-    else chip.textContent = `${displayDate(from)} – ${displayDate(to)} ▾`;
+    if (!from && !to) chip.textContent = 'No date data';
+    else if (from === to) chip.textContent = displayDate(from);
+    else chip.textContent = `${displayDate(from)} – ${displayDate(to)}`;
   }
 }
 
@@ -1369,6 +1387,14 @@ document.getElementById('clubFilter').addEventListener('change',()=>{
   renderAll();
 });
 
+document.querySelectorAll('[data-date-mode]').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('[data-date-mode]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('dateFilter').value = btn.dataset.dateMode;
+  updateDateControls();
+  renderAll();
+}));
+
 // Debounce helper — avoids re-rendering on every keystroke for date inputs
 function debounce(fn, ms){
   let t;
@@ -1377,7 +1403,7 @@ function debounce(fn, ms){
 const debouncedRenderAll = debounce(renderAll, 300);
 
 document.getElementById('dateFilter').addEventListener('change', renderAll);
-['singleDate','fromDate','toDate'].forEach(id => {
+['fromDate','toDate'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener('change', debouncedRenderAll);
 });
