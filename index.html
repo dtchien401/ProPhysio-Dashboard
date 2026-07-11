@@ -11,9 +11,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-    body { margin:0; font-family:'Inter',sans-serif; background:#f6f9fd; color:#0f172a; }
+    body { margin:0; font-family:'Inter',sans-serif; background:#f6f9fd; color:#0f172a; overflow-x:hidden; }
     .app { min-height:100vh; display:flex; background:#f6f9fd; }
-    .sidebar { width:260px; flex:0 0 260px; min-height:100vh; background:#fff; border-right:1px solid #e6edf6; padding:22px 18px; display:flex; flex-direction:column; justify-content:space-between; }
+    .sidebar { position:relative; width:260px; flex:0 0 260px; min-height:100vh; background:#fff; border-right:1px solid #e6edf6; padding:22px 18px; display:flex; flex-direction:column; justify-content:space-between; }
+    .sidebar-close-btn { display:none; }
+    .sidebar-backdrop { display:none; position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:190; }
+    .sidebar-backdrop.active { display:block; }
     .logo { width:190px; height:auto; object-fit:contain; margin:10px 8px 34px; }
     .nav-item { display:flex; align-items:center; gap:13px; padding:14px 16px; border-radius:16px; color:#334155; font-size:15px; font-weight:700; cursor:pointer; user-select:none; transition:.18s ease; }
     .nav-item:hover { background:#eef7ff; color:#008AF5; }
@@ -78,16 +81,43 @@
     @media (max-width:1300px){ .kpi-grid{grid-template-columns:repeat(3,1fr);} .grid-12{grid-template-columns:repeat(6,1fr);} .col-span-5,.col-span-4,.col-span-3,.col-span-6,.col-span-8{grid-column:span 6/span 6!important;} }
     @media (max-width:900px){
       .app{display:block;}
-      .sidebar{width:100%;min-height:auto;display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;overflow-y:auto;}
+      .sidebar{width:82%;max-width:320px;min-height:100vh;display:none;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto;box-shadow:0 0 40px rgba(15,23,42,.25);}
       .sidebar.sidebar-open{display:flex;}
-      #sidebarToggle{display:block!important;}
-      .main{padding:18px;}
-      .topbar{flex-direction:column;}
+      .sidebar-close-btn{display:flex;align-items:center;justify-content:center;position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:10px;border:1px solid #dce8f4;background:#fff;color:#334155;font-size:16px;cursor:pointer;z-index:2;}
+      #sidebarToggle{display:flex!important;flex:0 0 auto;}
+      .main{padding:16px;}
+      .topbar{flex-direction:column;align-items:stretch!important;gap:12px;}
+      .topbar > div:last-child{width:100%;justify-content:flex-start;}
+      .page-title{font-size:22px;}
+      .page-subtitle{font-size:12.5px;}
       .kpi-grid{grid-template-columns:repeat(2,1fr);}
+      .chart-lg{height:220px;}
+      .chart-md{height:200px;}
+      .chart-sm{height:170px;}
+      .table-wrap{-webkit-overflow-scrolling:touch;}
+      .card{border-radius:16px;}
+      .summary-item{padding:14px;min-height:auto;}
     }
     @media (max-width:540px){
       .kpi-grid{grid-template-columns:1fr;}
-      td, th { white-space: normal; min-width: 80px; }
+      .kpi-card:first-child .kpi-value{font-size:24px;}
+      .main{padding:12px;}
+      .page-title{font-size:20px;}
+      .segmented{width:100%;}
+      .segmented button{flex:1;padding:10px 6px;font-size:12.5px;}
+      .date-chip{width:100%;text-align:center;}
+      .chart-lg{height:200px;}
+      .chart-md{height:180px;}
+      .grid-12{gap:12px;}
+      .card.p-4{padding:14px!important;}
+      .card.p-5{padding:16px!important;}
+      td, th { white-space: nowrap; }
+      table{font-size:11.5px;}
+    }
+    @media (max-width:380px){
+      .kpi-card{padding:12px;gap:10px;}
+      .icon-pill{width:36px;height:36px;flex:0 0 36px;}
+      .segmented button{padding:9px 4px;font-size:11.5px;}
     }
   </style>
 </head>
@@ -100,6 +130,7 @@
 
 <div class="app">
   <aside class="sidebar">
+    <button id="sidebarClose" class="sidebar-close-btn" onclick="closeSidebar()" aria-label="Close menu">✕</button>
     <div>
       <img src="logo.png" alt="California ProPhysio" class="logo" />
       <nav class="space-y-2">
@@ -147,7 +178,7 @@
   <main class="main">
     <header class="topbar">
       <div style="display:flex;align-items:center;gap:12px;">
-        <button id="sidebarToggle" onclick="document.querySelector('.sidebar').classList.toggle('sidebar-open')" style="display:none;background:none;border:1px solid #dce8f4;border-radius:10px;padding:8px 11px;cursor:pointer;font-size:18px;line-height:1;color:#334155;">☰</button>
+        <button id="sidebarToggle" onclick="toggleSidebar()" style="display:none;background:none;border:1px solid #dce8f4;border-radius:10px;padding:8px 11px;cursor:pointer;font-size:18px;line-height:1;color:#334155;">☰</button>
         <div>
           <h1 id="pageTitle" class="page-title">OVERVIEW</h1>
           <p id="pageSubtitle" class="page-subtitle">Physio Therapy Performance Dashboard</p>
@@ -296,7 +327,7 @@
     </section>
   </main>
 </div>
-
+<div id="sidebarBackdrop" class="sidebar-backdrop" onclick="closeSidebar()"></div>
 
 <script>
 /* =========================================================
@@ -1183,7 +1214,7 @@ function renderCharts(){
   makeChart('productMixChart',{
     type:'doughnut',
     data:{labels:products.map(x=>x.product),datasets:[{data:products.map(x=>x.revenue),backgroundColor:CHART_COLORS.product,borderColor:'#fff',borderWidth:4}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:'#334155',boxWidth:10,usePointStyle:true}}}}
+    options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:window.innerWidth<=760?'bottom':'right',labels:{color:'#334155',boxWidth:10,usePointStyle:true,padding:12}}}}
   });
 
   const totalBooked = sum(data,'booked');
@@ -1315,7 +1346,24 @@ function buildFallbackData(){
   state.days = [];
 }
 
-document.querySelectorAll('.nav-item').forEach(x=>x.addEventListener('click',()=>setPage(x.dataset.page)));
+function openSidebar(){
+  document.querySelector('.sidebar').classList.add('sidebar-open');
+  document.getElementById('sidebarBackdrop').classList.add('active');
+}
+function closeSidebar(){
+  document.querySelector('.sidebar').classList.remove('sidebar-open');
+  document.getElementById('sidebarBackdrop').classList.remove('active');
+}
+function toggleSidebar(){
+  const sb = document.querySelector('.sidebar');
+  sb.classList.contains('sidebar-open') ? closeSidebar() : openSidebar();
+}
+window.addEventListener('resize', ()=>{ if (window.innerWidth > 900) closeSidebar(); });
+
+document.querySelectorAll('.nav-item').forEach(x=>x.addEventListener('click',()=>{
+  setPage(x.dataset.page);
+  if (window.innerWidth <= 900) closeSidebar();
+}));
 document.getElementById('clubFilter').addEventListener('change',()=>{
   document.querySelectorAll('[data-club-button]').forEach(b=>b.classList.toggle('active', b.dataset.clubButton === document.getElementById('clubFilter').value));
   renderAll();
