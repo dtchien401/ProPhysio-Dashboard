@@ -785,15 +785,21 @@ function isoFromParts(y, m, d){
 }
 
 function mtdRange(maxIso){
-  const d = parseDateAny(maxIso);
-  if (!d) return { from:'', to:'' };
-  return { from: isoFromParts(d.getFullYear(), d.getMonth(), 1), to: maxIso };
+  // "Current month" phải luôn dựa theo ngày hôm nay thực tế, KHÔNG dựa theo
+  // ngày lớn nhất có trong dữ liệu — vì dữ liệu có thể chứa các booking đặt
+  // trước cho tương lai (vd tháng sau), khiến maxIso rơi vào tháng sau.
+  const now = new Date();
+  const todayIso = isoFromParts(now.getFullYear(), now.getMonth(), now.getDate());
+  const from = isoFromParts(now.getFullYear(), now.getMonth(), 1);
+  // "to" chỉ lấy maxIso nếu maxIso không vượt quá hôm nay, tránh kéo range sang tương lai.
+  const to = (maxIso && maxIso < todayIso) ? maxIso : todayIso;
+  return { from, to };
 }
 
 function lastMonthRange(maxIso){
-  const d = parseDateAny(maxIso);
-  if (!d) return { from:'', to:'' };
-  const lastDayPrevMonth = new Date(d.getFullYear(), d.getMonth(), 0);
+  // Tương tự mtdRange: tháng trước phải tính từ hôm nay thực tế, không từ maxIso.
+  const now = new Date();
+  const lastDayPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
   return {
     from: isoFromParts(lastDayPrevMonth.getFullYear(), lastDayPrevMonth.getMonth(), 1),
     to: isoFromParts(lastDayPrevMonth.getFullYear(), lastDayPrevMonth.getMonth(), lastDayPrevMonth.getDate())
